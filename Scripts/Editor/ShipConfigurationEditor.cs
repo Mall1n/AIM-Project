@@ -91,10 +91,10 @@ public class ShipConfigurationEditor : Editor
             int index = shipConfiguration.transformsForEngines.Count;
             if (index != 0)
             {
-                index -= 1;
                 Undo.RegisterFullObjectHierarchyUndo(shipConfiguration.gameObject, $"Remove Engine");
+                index -= 1;
                 if (shipConfiguration.transformsForEngines[index] != null && shipConfiguration.engineTypes[index] != 0)
-                    DestroyObject(shipConfiguration.transformsForEngines[index].GetComponentInChildren<Engine>()?.gameObject);
+                    DestroyObject(shipConfiguration.transformsForEngines[index].GetComponentInChildren<Engine>()?.gameObject, index);
                 shipConfiguration.engines.RemoveAt(index);
                 shipConfiguration.transformsForEngines.RemoveAt(index);
                 shipConfiguration.engineTypes.RemoveAt(index);
@@ -104,9 +104,6 @@ public class ShipConfigurationEditor : Editor
 
         GUILayout.EndHorizontal();
 
-        //GUILayout.Label("Some");
-
-        //Debug.Log($"enginesTransforms.Count = {enginesTransforms.Count} | engines.Count = {engines.Count}");
         for (int i = 0; i < enginesTransforms.Count; i++)
         {
             GUILayout.BeginHorizontal(EditorStyles.helpBox);
@@ -130,7 +127,7 @@ public class ShipConfigurationEditor : Editor
                 else if (shipConfiguration.transformsForEngines[i] != null)
                 {
                     Undo.RegisterFullObjectHierarchyUndo(shipConfiguration.gameObject, $"Transform delete");
-                    DestroyObject(shipConfiguration.transformsForEngines[i].GetComponentInChildren<Engine>()?.gameObject);
+                    DestroyObject(shipConfiguration.transformsForEngines[i].GetComponentInChildren<Engine>()?.gameObject, i);
                     shipConfiguration.engineTypes[i] = Engine.EngineType.Unknown;
                     shipConfiguration.transformsForEngines[i] = null;
                 }
@@ -149,12 +146,11 @@ public class ShipConfigurationEditor : Editor
                     if (shipConfiguration.engineTypes[i] != 0)
                     {
                         GameObject LoadedEngine = Resources.Load(Engine.PathToEngines[(int)Engine.EngineType.FirstEngine], typeof(GameObject)) as GameObject;
-                        Instantiate(LoadedEngine, enginesTransforms[i]);
-                        Debug.Log("Inst");
+                        SetEngine(LoadedEngine, enginesTransforms[i], i);
                     }
                     else if (shipConfiguration.engineTypes[i] == 0)
                     {
-                        DestroyObject(enginesTransforms[i].GetComponentInChildren<Engine>()?.gameObject);
+                        DestroyObject(enginesTransforms[i].GetComponentInChildren<Engine>()?.gameObject, i);
                     }
                 }
             }
@@ -164,12 +160,21 @@ public class ShipConfigurationEditor : Editor
         }
     }
 
-    private void DestroyObject(GameObject gameObject)
+    private void DestroyObject(GameObject gameObject, int indexEngine)
     {
+        if (gameObject == null) return;
         Debug.Log("Destroy");
-        if (gameObject != null)
-            DestroyImmediate(gameObject);
+        DestroyImmediate(gameObject);
+        shipConfiguration.engines[indexEngine] = null;
+    }
 
+    private void SetEngine(GameObject instantObject, Transform parent, int indexEngine)
+    {
+        if (instantObject == null || parent == null) return;
+        Debug.Log("SetEngine");
+        Instantiate(instantObject, parent);
+        Engine engine = parent.GetComponentInChildren<Engine>();
+        shipConfiguration.engines[indexEngine] = engine;
     }
 
     private void GUILayoutSpace()
