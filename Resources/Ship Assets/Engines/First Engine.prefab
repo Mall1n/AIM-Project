@@ -45,10 +45,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97945e85220452b4f849a93498217863, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: 
-  power: 50
-  engineType: 0
-  transformParent: {fileID: 0}
+  name: 
+  power: 40
+  energyUsage: 0
+  mass: 0
 --- !u!1001 &4093001658268118676
 PrefabInstance:
   m_ObjectHideFlags: 0

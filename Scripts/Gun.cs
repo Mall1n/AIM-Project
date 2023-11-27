@@ -2,11 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-public class Engine : MonoBehaviour
+public class Gun : MonoBehaviour
 {
-    [SerializeField] private readonly ItemID.Engine engineID = 0;
+    [SerializeField] private readonly ItemID.Gun gunID = 0;
     [SerializeField] private new string name;
     public string Name { get => name; }
     [SerializeField] private float power;
