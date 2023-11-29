@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 785045856062249673}
   - component: {fileID: -2744480638318118894}
   m_Layer: 0
-  m_Name: First Engine
+  m_Name: First Engine Test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,8 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97945e85220452b4f849a93498217863, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  engineID: 1
-  itemType: 1
+  itemType: 2
   name: 
   power: 40
   energyUsage: 0

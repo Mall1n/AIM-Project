@@ -2,13 +2,22 @@ using UnityEngine;
 using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[ExecuteAlways]
+// [ExecuteAlways]
 public class PlayerShipMovement : MonoBehaviour
 {
-    [SerializeField] private float maxSpeed = 5;
+    [SerializeField][Range(0, 25)] private float maxSpeed = 5;
     [SerializeField][Range(0, 50)] private float acceleration = 0;
-    public float Acceleration { set { acceleration = value; DefineAcceleration(); } }
+    public float Acceleration
+    {
+        get => acceleration;
+        set
+        {
+            acceleration = value;
+            DefineAcceleration();
+        }
+    }
     [SerializeField][Range(0.01f, 1f)] private float mobility = 0.6f;
+    public float Mobility { get => mobility; set { mobility = value; DefineMobility(); } }
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Camera _camera;
 
@@ -16,9 +25,8 @@ public class PlayerShipMovement : MonoBehaviour
     [SerializeField] private bool LogDrawLinesDirection = true;
     //Log
 
-
+    [SerializeField] // Log
     private float _acceleration = 0;
-    //[SerializeField]
     private float _rotateMobility = 0;
 
     private Vector2 mousePosition;
@@ -39,15 +47,13 @@ public class PlayerShipMovement : MonoBehaviour
         if (rb == null)
             throw new NullReferenceException("Rigidbody2D is null");
 
-        Application.targetFrameRate = 60; // delete
-
         DefineFields();
     }
 
     private void Update()
     {
         //Log
-        DefineFields();
+        //DefineFields();
         //Log
 
         GetMoveAxis();
@@ -60,7 +66,7 @@ public class PlayerShipMovement : MonoBehaviour
 
         Move();
 
-        ObjectRotate(GetMousePosition());
+        ObjectRotate();
     }
 
     private void DefineFields()
@@ -74,9 +80,9 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void DefineMobility()
     {
-        if (mobility < 1)
+        if (Mobility < 1)
         {
-            float reverseMobility = 1 - mobility;
+            float reverseMobility = 1 - Mobility;
             _rotateMobility = (360 - (reverseMobility * 360)) / (90 * reverseMobility) + 1;
             if (_rotateMobility > 180) _rotateMobility = 180;
         }
@@ -97,12 +103,14 @@ public class PlayerShipMovement : MonoBehaviour
         return Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg - 90;
     }
 
-    private void ObjectRotate(float angle)
+    private void ObjectRotate()
     {
-        //rb.rotation = angle;
+        GetMousePosition();
 
         Quaternion q = Quaternion.LookRotation(Vector3.forward, mousePosition);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility);
+
+        rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility).eulerAngles.z;
+        //rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility);
     }
 
     private void Move()
@@ -129,6 +137,13 @@ public class PlayerShipMovement : MonoBehaviour
         moveY_From = moveYraw;
         moveDirection_From = moveDirection;
         lerp = 0;
+    }
+
+    public void UpdateValues(float maxSpeed, float acceleration, float mobility)
+    {
+        this.maxSpeed = maxSpeed;
+        Acceleration = acceleration;
+        Mobility = mobility;
     }
 
     private void OnDrawGizmos()
