@@ -12,12 +12,14 @@ public class ShipConfiguration : MonoBehaviour
     public List<Gun> heavyGuns; // make private
     [SerializeField] private Item[] inventory;
 
+    public static Action<float, float, float> onChangedMovementValues;
+
     public void SetInventoryCapacity(int capacity)
     {
         int capacityNow = inventory.Count(s => s != null);
         if (capacity >= capacityNow)
             Array.Resize(ref inventory, capacity);
-        else 
+        else
             throw new IndexOutOfRangeException($"Inventory capacity = {capacityNow} tried resize to {capacity}");
     }
 
@@ -44,10 +46,10 @@ public class ShipConfiguration : MonoBehaviour
     private void Start()
     {
         UpdateEmptyLists();
-        FullUpdateShipValues();
+        FullDefineShipValues();
     }
 
-    public void FullUpdateShipValues()
+    public void FullDefineShipValues()
     {
         float powerEngines = GetPowerEngines();
 
@@ -55,13 +57,7 @@ public class ShipConfiguration : MonoBehaviour
         float acceleration = powerEngines / 25;
         float _mobility = mobility;
 
-        SendValuesToMovement(maxSpeed, acceleration, _mobility);
-    }
-
-    private void SendValuesToMovement(float maxSpeed, float acceleration, float mobility)
-    {
-        if (playerShipMovement != null)
-            playerShipMovement.UpdateValues(maxSpeed, acceleration, mobility);
+        onChangedMovementValues?.Invoke(maxSpeed, acceleration, _mobility);
     }
 
     private void DeleteEmpty<T>(List<T> list) => list.RemoveAll(s => s == null);

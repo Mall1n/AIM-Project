@@ -1,10 +1,12 @@
 using UnityEngine;
 using System;
+using UnityEditor;
 
 [RequireComponent(typeof(Rigidbody2D))]
 // [ExecuteAlways]
 public class PlayerShipMovement : MonoBehaviour
 {
+    [Header("Main Attributes")]
     [SerializeField][Range(0, 25)] private float maxSpeed = 5;
     [SerializeField][Range(0, 50)] private float acceleration = 0;
     public float Acceleration
@@ -21,6 +23,7 @@ public class PlayerShipMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Camera _camera;
 
+    [Header("Log Attributes")]
     //Log
     [SerializeField] private bool LogDrawLinesDirection = true;
     //Log
@@ -50,10 +53,20 @@ public class PlayerShipMovement : MonoBehaviour
         DefineFields();
     }
 
+    private void OnEnable()
+    {
+        ShipConfiguration.onChangedMovementValues += UpdateValues;
+    }
+
+    private void OnDisable()
+    {
+        ShipConfiguration.onChangedMovementValues -= UpdateValues;
+    }
+
     private void Update()
     {
         //Log
-        //DefineFields();
+        DefineFields();
         //Log
 
         GetMoveAxis();
@@ -62,11 +75,11 @@ public class PlayerShipMovement : MonoBehaviour
     private void FixedUpdate()
     {
         if (CheckChangeDirection())
-            ChangeDirection();
+            ResetValuesDirection();
 
         Move();
 
-        ObjectRotate();
+        BodyRotate();
     }
 
     private void DefineFields()
@@ -97,24 +110,69 @@ public class PlayerShipMovement : MonoBehaviour
         moveDirection_Raw = new Vector2(moveXraw, moveYraw).normalized;
     }
 
-    private float GetMousePosition()
+    private void GetMousePosition()
     {
         mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-        return Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg - 90;
+        //return Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg - 90;
     }
 
-    private void ObjectRotate()
+    private void BodyRotate()
     {
         GetMousePosition();
 
         Quaternion q = Quaternion.LookRotation(Vector3.forward, mousePosition);
 
         rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility).eulerAngles.z;
-        //rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility);
     }
+
+    // public float speed;
+    // public float speedPercentage = 0;
+    // public Vector2 VectorMy;
+
+    // private Quaternion rotationDirectionNow;
+    // //public Quaternion qMy;
+    // Vector2 DrowLineTest;
 
     private void Move()
     {
+        // bool old = false;
+        // if (!old)
+        // {
+        //     lerp += Time.deltaTime;
+        //     VectorMy = moveDirection_Raw;
+
+        //     Quaternion qMy = Quaternion.LookRotation(Vector3.forward, VectorMy);
+
+
+        //     if (moveXraw != 0 || moveYraw != 0)
+        //     {
+        //         if (speed == 0)
+        //         {
+        //             rotationDirectionNow = qMy;
+        //         }
+        //         else
+        //         {
+        //             rotationDirectionNow = Quaternion.RotateTowards(rotationDirectionNow, qMy, mobility * 3); // изменить знаачения на минимальных значениях
+        //         }
+        //         speed += (acceleration / 100);
+        //         if (speed > maxSpeed) speed = maxSpeed;
+
+        //     }
+        //     else
+        //     {
+        //         speed -= (acceleration / 100);
+        //         if (speed < 0) speed = 0;
+        //     }
+        //     speedPercentage = speed / maxSpeed;
+
+        //     Vector3 uelerMy = rotationDirectionNow.eulerAngles;
+        //     DrowLineTest = Quaternion.AngleAxis(uelerMy.z + 90, Vector3.forward) * Vector3.right * speedPercentage;
+
+        //     moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * _acceleration);
+
+        //     rb.velocity = new Vector2(moveDirection.x * maxSpeed, moveDirection.y * maxSpeed);
+        // }
+
         lerp += Time.deltaTime;
         if (moveXraw == 0 && moveYraw == 0)
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * _acceleration / factorDecreaseSpeed);
@@ -131,7 +189,7 @@ public class PlayerShipMovement : MonoBehaviour
         return false;
     }
 
-    private void ChangeDirection()
+    private void ResetValuesDirection()
     {
         moveX_From = moveXraw;
         moveY_From = moveYraw;
@@ -152,15 +210,19 @@ public class PlayerShipMovement : MonoBehaviour
             return;
 
         Vector2 position = new Vector2(transform.position.x, transform.position.y);
-        Gizmos.DrawLine(transform.position, position + moveDirection_Raw);
+        DrawLine(moveDirection_Raw);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(transform.position, position + moveDirection_From);
+        DrawLine(moveDirection_From);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, position + moveDirection);
+        DrawLine(moveDirection);
+
+        // Gizmos.color = Color.yellow;
+        // DrawLine(DrowLineTest);
 
         //Debug.Log($"from {transform.position} to {moveDirection}");
+        void DrawLine(Vector2 vector) => Gizmos.DrawLine(transform.position, position + vector);
     }
 
 }
