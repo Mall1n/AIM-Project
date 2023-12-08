@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameSettings : MonoBehaviour
 {
     [SerializeField] private int _FPSRate = 60;
-
     public int FPSRate { get => _FPSRate; set => _FPSRate = value; }
 
 

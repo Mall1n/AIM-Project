@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-using UnityEditor;
 
 [RequireComponent(typeof(Rigidbody2D))]
 // [ExecuteAlways]
@@ -41,11 +40,11 @@ public class PlayerShipMovement : MonoBehaviour
     private float moveXraw = 0;
     private float moveYraw = 0;
     private float lerp = 0;
-    private float factorDecreaseSpeed = 2;
+    private readonly float factorDecreaseSpeed = 2;
 
 
 
-    private void Start()
+    private void Awake()
     {
         if (rb == null)
             throw new NullReferenceException("Rigidbody2D is null");
@@ -110,15 +109,16 @@ public class PlayerShipMovement : MonoBehaviour
         moveDirection_Raw = new Vector2(moveXraw, moveYraw).normalized;
     }
 
-    private void GetMousePosition()
+    private Vector2 GetMousePosition()
     {
-        mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+        //mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+        return _camera.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         //return Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg - 90;
     }
 
     private void BodyRotate()
     {
-        GetMousePosition();
+        mousePosition = GetMousePosition();
 
         Quaternion q = Quaternion.LookRotation(Vector3.forward, mousePosition);
 

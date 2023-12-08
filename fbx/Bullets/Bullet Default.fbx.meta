@@ -9,6 +9,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Orange
     second: {fileID: 2100000, guid: adc2a56d83314b944bee9bdc929ffd06, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Orange Neon
+    second: {fileID: 2100000, guid: bebcc5a56a026e944afb409fcbf8f2aa, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

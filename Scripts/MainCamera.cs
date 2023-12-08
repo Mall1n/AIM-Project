@@ -48,7 +48,6 @@ public class MainCamera : MonoBehaviour
             _camera.orthographicSize -= scrollwheel * scrollSpeed;
             if (_camera.orthographicSize > maxCameraScale)
                 _camera.orthographicSize = maxCameraScale;
-
         }
         else if (scrollwheel > 0)
         {
