@@ -125,54 +125,8 @@ public class PlayerShipMovement : MonoBehaviour
         rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility).eulerAngles.z;
     }
 
-    // public float speed;
-    // public float speedPercentage = 0;
-    // public Vector2 VectorMy;
-
-    // private Quaternion rotationDirectionNow;
-    // //public Quaternion qMy;
-    // Vector2 DrowLineTest;
-
     private void Move()
     {
-        // bool old = false;
-        // if (!old)
-        // {
-        //     lerp += Time.deltaTime;
-        //     VectorMy = moveDirection_Raw;
-
-        //     Quaternion qMy = Quaternion.LookRotation(Vector3.forward, VectorMy);
-
-
-        //     if (moveXraw != 0 || moveYraw != 0)
-        //     {
-        //         if (speed == 0)
-        //         {
-        //             rotationDirectionNow = qMy;
-        //         }
-        //         else
-        //         {
-        //             rotationDirectionNow = Quaternion.RotateTowards(rotationDirectionNow, qMy, mobility * 3); // изменить знаачения на минимальных значениях
-        //         }
-        //         speed += (acceleration / 100);
-        //         if (speed > maxSpeed) speed = maxSpeed;
-
-        //     }
-        //     else
-        //     {
-        //         speed -= (acceleration / 100);
-        //         if (speed < 0) speed = 0;
-        //     }
-        //     speedPercentage = speed / maxSpeed;
-
-        //     Vector3 uelerMy = rotationDirectionNow.eulerAngles;
-        //     DrowLineTest = Quaternion.AngleAxis(uelerMy.z + 90, Vector3.forward) * Vector3.right * speedPercentage;
-
-        //     moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * _acceleration);
-
-        //     rb.velocity = new Vector2(moveDirection.x * maxSpeed, moveDirection.y * maxSpeed);
-        // }
-
         lerp += Time.deltaTime;
         if (moveXraw == 0 && moveYraw == 0)
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * _acceleration / factorDecreaseSpeed);

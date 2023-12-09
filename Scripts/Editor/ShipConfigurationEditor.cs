@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using Unity.VisualScripting;
-using System.Linq;
-using Unity.VisualScripting.IonicZip;
 
 
 [CustomEditor(typeof(ShipConfiguration))]

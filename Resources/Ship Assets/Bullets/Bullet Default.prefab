@@ -117,4 +117,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Bullet Default
   mass: 0
-  speed: 12
+  speed: 10
