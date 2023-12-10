@@ -2,6 +2,7 @@ using UnityEngine;
 
 public abstract class ItemShip : Item
 {
+    //[Header("Item Type")]
     [SerializeField] private Type itemType = 0;
     public Type ItemType { get => itemType; }
     public enum Type : int

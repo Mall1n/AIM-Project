@@ -30,7 +30,7 @@ public class PlayerFire : Fire
     {
         if (Input.GetMouseButtonUp(0))
         {
-            onPlayerStopFired.Invoke();
+            onPlayerStopFired?.Invoke();
         }
     }
 
@@ -38,7 +38,7 @@ public class PlayerFire : Fire
     {
         if (Input.GetMouseButtonDown(0))
         {
-            onPlayerFired.Invoke();
+            onPlayerFired?.Invoke();
         }
     }
 }

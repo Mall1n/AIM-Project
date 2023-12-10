@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ItemID
 {
@@ -17,18 +15,15 @@ public class ItemID
                                                                     "Ship Assets/Engines/First Engine Test"
                                                                 };
 
-
     public enum EasyGun : int
     {
         Unknown = 0,
-        FirstGun = 1,
+        Single_Barrel = 1,
     }
-
-
 
     public static List<string> PathToEasyGuns = new List<string>(){
                                                                     "",
-                                                                    "Ship Assets/Guns/First Gun",
+                                                                    "Ship Assets/Guns/Single-Barrel Gun",
                                                                 };
 
     public enum HeavyGun : int

@@ -4,8 +4,9 @@ using UnityEngine;
 public class Gun : ItemShip
 {
     [Header("Main Stats")]
+    [SerializeField] private Bullet.Type barrelType;
+    [SerializeField][Range(1, 5)] private int levelUpgrage = 1;
     [SerializeField] private float energyUsage;
-    [SerializeField] private float damage;
     [SerializeField][Range(0, 1)] private float accuracy = 0.9f;
     public float Accuracy
     {
@@ -17,7 +18,7 @@ public class Gun : ItemShip
         }
     }
 
-    [SerializeField] private float speedReload;
+    [SerializeField] private float timeReload;
 
 
     [Header("Fire rate in minutte")]
@@ -32,12 +33,16 @@ public class Gun : ItemShip
     [SerializeField] private AudioClip audioClipFire;
     public AudioSource[] AudioFires { get => audioFires; }
 
+    [Header("Additional Settings")]
+    [SerializeField] private bool chamber = false;
+
 
     //[SerializeField] 
     //[SerializeField] 
-    private Rigidbody2D rb;
+    private Rigidbody2D shipRB;
     private Fire fireScript;
     private GameObject bulletObject;
+    private GameObject sleeveObject;
     private int shotsFired = 0;
     private float fireRateInFixedFrame;
     private float spread;
@@ -47,6 +52,9 @@ public class Gun : ItemShip
     private bool reloaded = true;
     private float timeFiring = 0;
     private Transform transformFirePoint;
+    private Transform transformChamber;
+    private const float maxAngleGunSpread = 10;
+
 
 
     private void FixedUpdate()
@@ -56,9 +64,18 @@ public class Gun : ItemShip
 
     void Start()
     {
-        rb = transform.root.GetComponent<Rigidbody2D>();
-        bulletObject = Resources.Load("Ship Assets/Bullets/Bullet Default", typeof(GameObject)) as GameObject;
-        transformFirePoint = GetComponentInChildren<Transform>();
+        if (chamber)
+        {
+            transformChamber = transform.Find("Chamber")?.GetComponent<Transform>();
+            if (transformChamber == null)
+                chamber = false;
+            else
+                LoadSleeveInGun();
+        }
+        LoadBulletInGun();
+        transformFirePoint = transform.Find("EndBurrel")?.GetComponent<Transform>();
+        if (transformFirePoint == null)
+            throw new NullReferenceException($"transformFirePoint = {transformFirePoint}");
         for (int i = 0; i < AudioFires.Length; i++)
             AudioFires[i].clip = audioClipFire;
         spread = ReturnSpread();
@@ -67,9 +84,22 @@ public class Gun : ItemShip
             throw new IndexOutOfRangeException($"fireRateInFixedFrame was < 0 (fireRateInFixedFrame = {fireRateInFixedFrame})");
     }
 
+    private void LoadBulletInGun()
+    {
+        bulletObject = Resources.Load("Ship Assets/Bullets/CB 13.45", typeof(GameObject)) as GameObject;
+    }
+
+    private void LoadSleeveInGun()
+    {
+        sleeveObject = Resources.Load("Ship Assets/Bullets/CB 13.45 sleeve", typeof(GameObject)) as GameObject;
+    }
+
     private void Awake()
     {
         fireScript = transform.root.GetComponent<Fire>();
+        shipRB = transform.root.GetComponent<Rigidbody2D>();
+        if (fireScript == null || shipRB == null)
+            throw new NullReferenceException($"fireScript = {fireScript} and shipRB = {shipRB}");
     }
 
     private void OnEnable()
@@ -100,52 +130,34 @@ public class Gun : ItemShip
         }
     }
 
+    static float randomSeed = 456;
     private void InitShot()
     {
-        // Quaternion q = Quaternion.Euler(transformFirePoint.rotation.x, transformFirePoint.rotation.y, transformFirePoint.rotation.z + 45);
-        // GameObject gameObject = new GameObject();
-        // gameObject.transform.eulerAngles = new Vector3(transformFirePoint.rotation.x, transformFirePoint.rotation.y, transformFirePoint.rotation.z + 45);
-        // //t.eulerAngles = new Vector3(transformFirePoint.rotation.x, transformFirePoint.rotation.y, transformFirePoint.rotation.z + 45);
+        InitBullet();
+
+        if (chamber)
+            InitChamber();
+
+        shotsFired += 1;
+    }
+
+    private void InitBullet()
+    {
         GameObject _bulletObject = Instantiate(this.bulletObject, transformFirePoint.position, transformFirePoint.rotation);
         Bullet bullet = _bulletObject.GetComponent<Bullet>();
         Rigidbody2D bullet_rb = _bulletObject.GetComponent<Rigidbody2D>();
         if (bullet_rb == null)
             return;
 
-        UnityEngine.Random.InitState(System.DateTime.Now.Millisecond);
-        float randomDegrees = UnityEngine.Random.Range(-0.5f, 0.5f);
+        //UnityEngine.Random.InitState(System.DateTime.Now.Millisecond);
+        UnityEngine.Random.InitState((int)(randomSeed * 10000));
 
-        //bullet_rb.rotation += 45;
+        float angelSpread = randomSeed = maxAngleGunSpread * UnityEngine.Random.Range(-1f, 1f) * spread;
 
-        //float radian = 90 * (Mathf.PI / 180);
-        //Vector2 tmp = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
+        Vector3 bulletVectorEuler = _bulletObject.transform.eulerAngles;
+        _bulletObject.transform.eulerAngles = new Vector3(bulletVectorEuler.x, bulletVectorEuler.y, bulletVectorEuler.z + angelSpread);
+        Vector2 force = _bulletObject.transform.up * (float)bullet?.Speed + (Vector3)shipRB.velocity;
 
-        // float degrees = Mathf.Atan2(transformFirePoint.up.x, transformFirePoint.up.y) * Mathf.Rad2Deg;
-        // degrees += 45;
-        // float radian = 45 * (Mathf.PI / 180);
-        // Vector2 vectorBullet = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
-
-        //bullet_rb.rotation += 45;
-
-        
-
-        Vector2 force = transformFirePoint.up * (float)bullet?.Speed;
-        //Vector2 force = vectorBullet * (float)bullet?.Speed;
-        if (rb)
-            force += rb.velocity;
-        // System.Random rnd = new System.Random(5);
-        // float rndttemp = (float)rnd.NextDouble() * 0.5f - 1;
-        // force += (Vector2)transformFirePoint.right * rndttemp * spread;
-        //UnityEngine.Random.seed = System.DateTime.Now.Millisecond;
-
-
-        //Vector2 tmp = -(Vector2)transformFirePoint.right * 0.5f * (float)bullet?.Speed;
-
-        // float radian = 90 * (Mathf.PI / 180);
-        // Vector2 tmp = -(Vector2)transformFirePoint.right * new Vector2(Mathf.Cos(radian), Mathf.Sin(radian)) * (float)bullet?.Speed;
-        // force += tmp;
-
-        //force += (Vector2)transformFirePoint.right * UnityEngine.Random.Range(-0.5f, 0.5f) * spread;
         AddForce(force);
 
         FireAnimator?.SetTrigger(triggerNameFire);
@@ -154,9 +166,29 @@ public class Gun : ItemShip
             ausioSourseIndex = 0;
         AudioFires[ausioSourseIndex]?.Play();
 
-        shotsFired += 1;
-
         void AddForce(Vector2 force) => bullet_rb.AddForce(force, ForceMode2D.Impulse);
+    }
+
+    private void InitChamber()
+    {
+        GameObject _sleeveObject = Instantiate(this.sleeveObject, transformChamber.position, transformChamber.rotation);
+        Rigidbody2D sleeve_rb = _sleeveObject.GetComponent<Rigidbody2D>();
+
+        if (sleeve_rb == null)
+            return;
+
+        UnityEngine.Random.InitState((int)(randomSeed * 10000));
+
+        float angelRotate = randomSeed = maxAngleGunSpread * UnityEngine.Random.Range(-1f, 1f) * 10;
+
+        Vector3 sleeveVectorEuler = _sleeveObject.transform.eulerAngles;
+        _sleeveObject.transform.eulerAngles = new Vector3(sleeveVectorEuler.x, sleeveVectorEuler.y, sleeveVectorEuler.z + angelRotate);
+
+        Vector2 force = (transformChamber.transform.up + new Vector3(0, UnityEngine.Random.Range(-0.2f, 0.2f), 0)) * UnityEngine.Random.Range(0.1f, 0.5f) + (Vector3)shipRB.velocity;
+
+        AddForce(force);
+
+        void AddForce(Vector2 force) => sleeve_rb.AddForce(force, ForceMode2D.Impulse);
     }
 
     private void StartFire()

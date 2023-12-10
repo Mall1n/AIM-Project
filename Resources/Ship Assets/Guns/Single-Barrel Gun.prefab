@@ -173,7 +173,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 0.28
-  m_Pitch: 1.11
+  m_Pitch: 1.06
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -396,7 +396,7 @@ GameObject:
   - component: {fileID: 1166742470136003454}
   - component: {fileID: 3939544411432735713}
   m_Layer: 0
-  m_Name: Fire
+  m_Name: Fire Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -804,7 +804,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 8649ccb25fcf75541a0ead0cc10b3430, type: 3}
       propertyPath: m_Name
-      value: First Gun
+      value: Single-Barrel Gun
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -849,13 +849,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 803c5cdc773d938469dd21ec03350e7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: First default gun
+  name: Single-Barrel Gun
   mass: 20
   itemType: 2
+  barrelType: 1
+  levelUpgrage: 1
   energyUsage: 5
-  damage: 25
-  accuracy: 0.486
-  speedReload: 0
+  accuracy: 0.75
+  timeReload: 0
   fireRate: 400
   fireAnimator: {fileID: 1166742470136003454}
   audioFires:
@@ -865,6 +866,7 @@ MonoBehaviour:
   - {fileID: 7132284085297019755}
   - {fileID: 3302540323811636921}
   audioClipFire: {fileID: 8300000, guid: a6bf46711f7e27143a8af10c4ff360ec, type: 3}
+  chamber: 1
 --- !u!4 &7160856057258584108 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4626892002063666658, guid: 8649ccb25fcf75541a0ead0cc10b3430, type: 3}
