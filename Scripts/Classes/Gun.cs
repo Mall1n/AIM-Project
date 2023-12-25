@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class Gun : ItemShip
@@ -17,8 +19,8 @@ public class Gun : ItemShip
             spread = ReturnSpread();
         }
     }
-
     [SerializeField] private float timeReload;
+    [SerializeField] private bool leftSide = false;
 
 
     [Header("Fire rate in minutte")]
@@ -54,8 +56,9 @@ public class Gun : ItemShip
     private Transform transformFirePoint;
     private Transform transformChamber;
     private const float maxAngleGunSpread = 10;
+    private const float maxAngleSleeveRotate = 20;
 
-
+    static float randomSeed = 456;
 
     private void FixedUpdate()
     {
@@ -64,34 +67,80 @@ public class Gun : ItemShip
 
     void Start()
     {
+        FindEndBurrel();
+
+        SetAudioClipsInAudioSourses();
+
+        spread = ReturnSpread();
+
+        SetFireRateInFixedFrame();
+
+        LoadResources();
+
+        ChangeSpeedFireAnimation();
+    }
+
+    private void ChangeSpeedFireAnimation()
+    {
+        AnimatorController ac = fireAnimator.runtimeAnimatorController as AnimatorController;
+        ChildAnimatorState[] cas = ac.layers[fireAnimator.GetLayerIndex("Base Layer")].stateMachine.states.Where(x => x.state.tag == "Fire").ToArray();
+        foreach (var item in cas)
+            item.state.speed = ReturnAnimationSpeed();
+
+        float ReturnAnimationSpeed()
+        {
+            if (fireRate <= 600)
+                return 3;
+            else return fireRate / 200;
+        }
+    }
+
+    private void LoadResources()
+    {
+        LoadBulletInGun("Ship Assets/Bullets/AP 13.45");
+
         if (chamber)
         {
             transformChamber = transform.Find("Chamber")?.GetComponent<Transform>();
             if (transformChamber == null)
                 chamber = false;
             else
-                LoadSleeveInGun();
+                LoadSleeveInGun("Ship Assets/Bullets/CB 13.45 sleeve");
         }
-        LoadBulletInGun();
-        transformFirePoint = transform.Find("EndBurrel")?.GetComponent<Transform>();
-        if (transformFirePoint == null)
-            throw new NullReferenceException($"transformFirePoint = {transformFirePoint}");
+    }
+
+    private void SetAudioClipsInAudioSourses()
+    {
         for (int i = 0; i < AudioFires.Length; i++)
             AudioFires[i].clip = audioClipFire;
-        spread = ReturnSpread();
+    }
+
+    private void SetFireRateInFixedFrame()
+    {
         fireRateInFixedFrame = 60 / FireRate;
         if (fireRateInFixedFrame <= 0)
             throw new IndexOutOfRangeException($"fireRateInFixedFrame was < 0 (fireRateInFixedFrame = {fireRateInFixedFrame})");
     }
 
-    private void LoadBulletInGun()
+    private void FindEndBurrel()
     {
-        bulletObject = Resources.Load("Ship Assets/Bullets/CB 13.45", typeof(GameObject)) as GameObject;
+        transformFirePoint = transform.Find("EndBurrel")?.GetComponent<Transform>();
+        if (transformFirePoint == null)
+            throw new NullReferenceException($"transformFirePoint = {transformFirePoint}");
     }
 
-    private void LoadSleeveInGun()
+    private void LoadBulletInGun(string path)
     {
-        sleeveObject = Resources.Load("Ship Assets/Bullets/CB 13.45 sleeve", typeof(GameObject)) as GameObject;
+        bulletObject = Resources.Load(path, typeof(GameObject)) as GameObject;
+        if (bulletObject == null)
+            throw new NullReferenceException($"bulletObject = null");
+    }
+
+    private void LoadSleeveInGun(string path)
+    {
+        sleeveObject = Resources.Load(path, typeof(GameObject)) as GameObject;
+        if (sleeveObject == null)
+            throw new NullReferenceException($"sleeveObject = null");
     }
 
     private void Awake()
@@ -124,72 +173,77 @@ public class Gun : ItemShip
     {
         if (isLeftClicking)
         {
-            timeFiring += Time.fixedDeltaTime;
-            if (timeFiring > fireRateInFixedFrame * shotsFired)
+            if (timeFiring >= fireRateInFixedFrame * shotsFired)
                 InitShot();
+            timeFiring += Time.fixedDeltaTime;
         }
     }
 
-    static float randomSeed = 456;
     private void InitShot()
     {
         InitBullet();
 
         if (chamber)
-            InitChamber();
+            InitSleeve();
 
         shotsFired += 1;
+        //Debug.Log($"timeFiring = {timeFiring} | shotsFired = {shotsFired}");
     }
 
     private void InitBullet()
     {
-        GameObject _bulletObject = Instantiate(this.bulletObject, transformFirePoint.position, transformFirePoint.rotation);
-        Bullet bullet = _bulletObject.GetComponent<Bullet>();
-        Rigidbody2D bullet_rb = _bulletObject.GetComponent<Rigidbody2D>();
+        GameObject bulletObject = Instantiate(this.bulletObject, transformFirePoint.position, transformFirePoint.rotation);
+        Bullet bullet = bulletObject.GetComponent<Bullet>();
+        Rigidbody2D bullet_rb = bulletObject.GetComponent<Rigidbody2D>();
         if (bullet_rb == null)
             return;
 
         //UnityEngine.Random.InitState(System.DateTime.Now.Millisecond);
         UnityEngine.Random.InitState((int)(randomSeed * 10000));
 
-        float angelSpread = randomSeed = maxAngleGunSpread * UnityEngine.Random.Range(-1f, 1f) * spread;
+        float angelSpread = randomSeed = maxAngleGunSpread * Random(-1f, 1f) * spread;
 
-        Vector3 bulletVectorEuler = _bulletObject.transform.eulerAngles;
-        _bulletObject.transform.eulerAngles = new Vector3(bulletVectorEuler.x, bulletVectorEuler.y, bulletVectorEuler.z + angelSpread);
-        Vector2 force = _bulletObject.transform.up * (float)bullet?.Speed + (Vector3)shipRB.velocity;
+        Vector3 bulletVectorEuler = bulletObject.transform.eulerAngles;
+        bulletObject.transform.eulerAngles = new Vector3(bulletVectorEuler.x, bulletVectorEuler.y, bulletVectorEuler.z + angelSpread);
+        Vector2 force = bulletObject.transform.up * (float)bullet?.Speed + (Vector3)shipRB.velocity;
 
-        AddForce(force);
+        AddForceImpulse(bullet_rb, force);
 
         FireAnimator?.SetTrigger(triggerNameFire);
 
         if (++ausioSourseIndex >= AudioFires.Length)
             ausioSourseIndex = 0;
         AudioFires[ausioSourseIndex]?.Play();
-
-        void AddForce(Vector2 force) => bullet_rb.AddForce(force, ForceMode2D.Impulse);
     }
 
-    private void InitChamber()
+    private void InitSleeve()
     {
-        GameObject _sleeveObject = Instantiate(this.sleeveObject, transformChamber.position, transformChamber.rotation);
-        Rigidbody2D sleeve_rb = _sleeveObject.GetComponent<Rigidbody2D>();
-
+        GameObject sleeveObject = Instantiate(this.sleeveObject, transformChamber.position, transformChamber.rotation);
+        Rigidbody2D sleeve_rb = sleeveObject.GetComponent<Rigidbody2D>();
         if (sleeve_rb == null)
             return;
 
         UnityEngine.Random.InitState((int)(randomSeed * 10000));
 
-        float angelRotate = randomSeed = maxAngleGunSpread * UnityEngine.Random.Range(-1f, 1f) * 10;
+        float angelRotate = randomSeed = maxAngleSleeveRotate * Random(-1f, 1f);
 
-        Vector3 sleeveVectorEuler = _sleeveObject.transform.eulerAngles;
-        _sleeveObject.transform.eulerAngles = new Vector3(sleeveVectorEuler.x, sleeveVectorEuler.y, sleeveVectorEuler.z + angelRotate);
+        Vector3 sleeveVectorEuler = sleeveObject.transform.eulerAngles;
 
-        Vector2 force = (transformChamber.transform.up + new Vector3(0, UnityEngine.Random.Range(-0.2f, 0.2f), 0)) * UnityEngine.Random.Range(0.1f, 0.5f) + (Vector3)shipRB.velocity;
+        float angleRotateShift = sleeveVectorEuler.z - 90 * (_ = leftSide == true ? -1 : 1) * Random(0f, -0.25f);
+        if (angleRotateShift > 360) angleRotateShift -= 360;
+        else if (angleRotateShift < 0) angleRotateShift += 360;
+        float radian = angleRotateShift * Mathf.Deg2Rad;
+        Vector2 vectorDirection = new Vector2((float)Math.Sin(radian), (float)Math.Cos(radian));
 
-        AddForce(force);
+        sleeveObject.transform.eulerAngles = new Vector3(sleeveVectorEuler.x, sleeveVectorEuler.y, sleeveVectorEuler.z + angelRotate + 90);
+        Vector2 force = vectorDirection * Random(0.2f, 0.4f) + shipRB.velocity;
 
-        void AddForce(Vector2 force) => sleeve_rb.AddForce(force, ForceMode2D.Impulse);
+        AddForceImpulse(sleeve_rb, force);
     }
+
+    private void AddForceImpulse(Rigidbody2D rigidbody2D, Vector2 force) => rigidbody2D.AddForce(force, ForceMode2D.Impulse);
+
+    private float Random(float from, float to) => UnityEngine.Random.Range(from, to);
 
     private void StartFire()
     {

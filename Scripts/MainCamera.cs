@@ -10,8 +10,11 @@ public class MainCamera : MonoBehaviour
     [SerializeField] private float mixCameraScale = 1;
     [SerializeField] private float maxCameraScale = 10;
     [SerializeField][Range(0.5f, 5.0f)] private float scrollSpeed = 2.5f;
+    [Header("Backgroud")]
     [SerializeField][Range(1f, 100f)] private float backgroudDistance = 50f;
     [SerializeField] private GameObject backgroud;
+    //[SerializeField] 
+    private Vector2 backgroudOffset;
 
     private Camera _camera;
     private Material backgroudMaterial;
@@ -20,7 +23,10 @@ public class MainCamera : MonoBehaviour
     {
         _camera = GetComponent<Camera>();
         if (backgroud != null)
+        {
+            backgroudOffset = backgroud.transform.position;
             backgroudMaterial = backgroud.GetComponent<MeshRenderer>()?.materials[0];
+        }
 
         if (mixCameraScale > maxCameraScale)
             throw new IndexOutOfRangeException($"mixCameraScale ({mixCameraScale}) was large than maxCameraScale ({maxCameraScale})");
@@ -67,8 +73,6 @@ public class MainCamera : MonoBehaviour
             Vector3 from = new Vector3(transform.position.x, transform.position.y, transform.position.z);
             Vector3 to = new Vector3(moveTo.transform.position.x, moveTo.transform.position.y, transform.position.z);
             transform.position = Vector3.Lerp(from, to, smoothSpeed);
-
-            //transform.LookAt(moveTo.transform);
         }
         else
         {
@@ -83,8 +87,8 @@ public class MainCamera : MonoBehaviour
 
         Vector2 camPos = _camera.transform.position;
         backgroud.transform.position = new Vector3(
-        camPos.x - (camPos.x * (1 / backgroudDistance)),
-        camPos.y - (camPos.y * (1 / backgroudDistance)),
+        camPos.x - (camPos.x * (1 / backgroudDistance)) + backgroudOffset.x,
+        camPos.y - (camPos.y * (1 / backgroudDistance)) + backgroudOffset.y,
         backgroud.transform.position.z);
     }
 

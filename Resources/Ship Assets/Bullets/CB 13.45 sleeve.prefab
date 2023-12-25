@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: d4bc01d83f7bdc1408f17444fe3cb0cb, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c0b3975033cf7f24c998c41bf77390cc, type: 2}
     - target: {fileID: 919132149155446097, guid: d4bc01d83f7bdc1408f17444fe3cb0cb, type: 3}
       propertyPath: m_Name
       value: CB 13.45 sleeve
@@ -62,6 +66,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4bc01d83f7bdc1408f17444fe3cb0cb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6656589867191188575}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4bc01d83f7bdc1408f17444fe3cb0cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4446508284514595963}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d4bc01d83f7bdc1408f17444fe3cb0cb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3635577679092875785}
   m_SourcePrefab: {fileID: 100100000, guid: d4bc01d83f7bdc1408f17444fe3cb0cb, type: 3}
 --- !u!1 &2955749330369522941 stripped
 GameObject:
@@ -102,7 +112,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2955749330369522941}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -140,3 +150,36 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.013434842, y: 0.023788411}
   m_EdgeRadius: 0
+--- !u!114 &4446508284514595963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955749330369522941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c0de6bed5b23243ae8313e4d415ea9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!95 &3635577679092875785
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955749330369522941}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6923a9631afc93e4a99abeb4dcb4a6cb, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

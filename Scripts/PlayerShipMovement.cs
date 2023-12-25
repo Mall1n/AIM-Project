@@ -7,19 +7,18 @@ public class PlayerShipMovement : MonoBehaviour
 {
     [Header("Main Attributes")]
     [SerializeField][Range(0, 25)] private float maxSpeed = 5;
-    [SerializeField][Range(0, 50)] private float acceleration = 0;
+    [SerializeField][Range(0, 50)] private float accelerationValue = 0;
     public float Acceleration
     {
-        get => acceleration;
+        get => accelerationValue;
         set
         {
-            acceleration = value;
+            accelerationValue = value;
             DefineAcceleration();
         }
     }
     [SerializeField][Range(0.01f, 1f)] private float mobility = 0.6f;
     public float Mobility { get => mobility; set { mobility = value; DefineMobility(); } }
-    [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Camera _camera;
 
     [Header("Log Attributes")]
@@ -28,9 +27,10 @@ public class PlayerShipMovement : MonoBehaviour
     //Log
 
     [SerializeField] // Log
-    private float _acceleration = 0;
-    private float _rotateMobility = 0;
+    private float acceleration = 0;
+    private float rotateMobility = 0;
 
+    private Rigidbody2D rb;
     private Vector2 mousePosition;
     private Vector2 moveDirection_Raw;
     private Vector2 moveDirection;
@@ -46,8 +46,7 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void Awake()
     {
-        if (rb == null)
-            throw new NullReferenceException("Rigidbody2D is null");
+        rb = GetComponent<Rigidbody2D>();
 
         DefineFields();
     }
@@ -88,17 +87,17 @@ public class PlayerShipMovement : MonoBehaviour
         DefineMobility();
     }
 
-    private void DefineAcceleration() => _acceleration = acceleration / maxSpeed;
+    private void DefineAcceleration() => acceleration = accelerationValue / maxSpeed;
 
     private void DefineMobility()
     {
         if (Mobility < 1)
         {
             float reverseMobility = 1 - Mobility;
-            _rotateMobility = (360 - (reverseMobility * 360)) / (90 * reverseMobility) + 1;
-            if (_rotateMobility > 180) _rotateMobility = 180;
+            rotateMobility = (360 - (reverseMobility * 360)) / (90 * reverseMobility) + 1;
+            if (rotateMobility > 180) rotateMobility = 180;
         }
-        else { _rotateMobility = 180; }
+        else { rotateMobility = 180; }
     }
 
     private void GetMoveAxis()
@@ -122,16 +121,16 @@ public class PlayerShipMovement : MonoBehaviour
 
         Quaternion q = Quaternion.LookRotation(Vector3.forward, mousePosition);
 
-        rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility).eulerAngles.z;
+        rb.rotation = Quaternion.RotateTowards(transform.rotation, q, rotateMobility).eulerAngles.z;
     }
 
     private void Move()
     {
         lerp += Time.deltaTime;
         if (moveXraw == 0 && moveYraw == 0)
-            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * _acceleration / factorDecreaseSpeed);
+            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration / factorDecreaseSpeed);
         else
-            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * _acceleration);
+            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration);
 
         rb.velocity = new Vector2(moveDirection.x * maxSpeed, moveDirection.y * maxSpeed);
     }
