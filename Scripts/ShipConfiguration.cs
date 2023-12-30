@@ -2,15 +2,19 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 public class ShipConfiguration : MonoBehaviour
 {
-    [SerializeField] private PlayerShipMovement playerShipMovement;
+    [Header("Main Attributes")]
+    //[SerializeField] private PlayerShipMovement playerShipMovement;
+    //[SerializeField] private float mass = 0;
     [SerializeField][Range(0, 1)] private float mobility;
-    public List<Engine> engines; // make privatet
+    public List<Engine> engines; // make private
     public List<Gun> easyGuns; // make private
     public List<Gun> heavyGuns; // make private
     [SerializeField] private Item[] inventory;
+    private float fullMass = 0;
 
     public static Action<float, float, float> onChangedMovementValues;
 
@@ -46,6 +50,8 @@ public class ShipConfiguration : MonoBehaviour
     private void Start()
     {
         UpdateEmptyLists();
+
+        fullMass = GetFullShipMass();
         FullDefineShipValues();
     }
 
@@ -54,10 +60,23 @@ public class ShipConfiguration : MonoBehaviour
         float powerEngines = GetPowerEngines();
 
         float maxSpeed = powerEngines / 20;
-        float acceleration = powerEngines / 25;
-        float _mobility = mobility;
 
-        onChangedMovementValues?.Invoke(maxSpeed, acceleration, _mobility);
+        float _powerEngines = powerEngines / 25;
+        _powerEngines -= _powerEngines * fullMass / 10000;
+
+        float _mobility = mobility - (mobility * fullMass / 10000);
+
+        onChangedMovementValues?.Invoke(maxSpeed, _powerEngines, _mobility);
+    }
+
+    private float GetFullShipMass()
+    {
+        float mass = 0;
+        foreach (var item in engines)
+            mass += item.Mass;
+        foreach (var item in easyGuns)
+            mass += item.Mass;
+        return mass;
     }
 
     private void DeleteEmpty<T>(List<T> list) => list.RemoveAll(s => s == null);

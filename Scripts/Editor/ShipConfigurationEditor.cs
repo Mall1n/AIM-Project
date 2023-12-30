@@ -127,7 +127,7 @@ public class ShipConfigurationEditor : Editor
                 Undo.RegisterFullObjectHierarchyUndo(shipConfiguration.gameObject, removeButtonText);
                 index -= 1;
                 if (shipPartTransforms[index] != null && (int)(object)shipIDParts[index] != 0)
-                    DestroyObj<T>(shipPartTransforms[index].GetComponentInChildren<T>()?.gameObject, index, ref shipParts);
+                    DestroyObject<T>(shipPartTransforms[index].GetComponentInChildren<T>()?.gameObject, index, ref shipParts);
                 shipParts.RemoveAt(index);
                 shipPartTransforms.RemoveAt(index);
                 shipIDParts.RemoveAt(index);
@@ -160,7 +160,7 @@ public class ShipConfigurationEditor : Editor
                 else if (shipPartTransforms[i] != null)
                 {
                     Undo.RegisterFullObjectHierarchyUndo(shipConfiguration.gameObject, $"Transform delete");
-                    DestroyObj<T>(shipPartTransforms[i].GetComponentInChildren<T>()?.gameObject, i, ref shipParts);
+                    DestroyObject<T>(shipPartTransforms[i].GetComponentInChildren<T>()?.gameObject, i, ref shipParts);
                     shipIDParts[i] = (V)(object)ItemID.Engine.Unknown;
                     shipPartTransforms[i] = null;
                 }
@@ -181,14 +181,20 @@ public class ShipConfigurationEditor : Editor
                         T componentT = LoadedPrefab.GetComponent<T>();
                         if (componentT != null && componentT.ItemType == typeOfPartShipTarget)
                         {
+                            GameObject previousObject = thisShipPartTransforms[i].GetComponentInChildren<T>()?.gameObject;
+                            if (previousObject != null)
+                                DestroyObject<T>(previousObject, i, ref shipParts);
+
                             ShipSpot itemPart = partTransform.GetComponent<ShipSpot>();
-                            SetObj<T>(LoadedPrefab, thisShipPartTransforms[i], i, ref shipParts, (itemPart != null && itemPart.LeftSide == true));
+                            SetObject<T>(LoadedPrefab, thisShipPartTransforms[i], i, ref shipParts, (itemPart != null && itemPart.LeftSide == true));
                             shipIDParts[i] = thisShipIDParts[i];
                         }
                     }
                     else if (idPart == 0)
                     {
-                        DestroyObj<T>(thisShipPartTransforms[i].GetComponentInChildren<T>()?.gameObject, i, ref shipParts);
+                        GameObject previousObject = thisShipPartTransforms[i].GetComponentInChildren<T>()?.gameObject;
+                        if (previousObject != null)
+                            DestroyObject<T>(previousObject, i, ref shipParts);
                         shipIDParts[i] = thisShipIDParts[i];
                     }
                 }
@@ -201,27 +207,34 @@ public class ShipConfigurationEditor : Editor
         GUILayout.EndHorizontal();
     }
 
-    private void DestroyObj<T>(GameObject gameObject, int indexEngine, ref List<T> targetList) where T : Behaviour
+    // private void TryDestroyObject<T>(GameObject gameObject, int indexEngine, ref List<T> targetList) where T : ItemShip
+    // {
+    //     if (gameObject != null)
+
+    // }
+
+    private void DestroyObject<T>(GameObject gameObject, int indexEngine, ref List<T> targetList) where T : ItemShip
     {
-        if (gameObject == null) return;
+        //if (gameObject == null) return;
 
         DestroyImmediate(gameObject);
         targetList[indexEngine] = null;
         // Debug.Log("Destroy");
     }
 
-    private void SetObj<T>(GameObject instantObject, Transform parent, int indexEngine, ref List<T> targetList, bool scaleReverse) where T : Behaviour
+    private void SetObject<T>(GameObject instantObject, Transform parent, int indexEngine, ref List<T> targetList, bool scaleReverse) where T : ItemShip
     {
         if (instantObject == null || parent == null) return;
 
         UnityEngine.Object prefab = PrefabUtility.InstantiatePrefab(instantObject, parent);
-        T engine = parent.GetComponentInChildren<T>();
-        targetList[indexEngine] = engine;
+        T _object = parent.GetComponentInChildren<T>();
+        targetList[indexEngine] = _object;
         if (scaleReverse)
         {
             Transform transform = prefab.GetComponentInChildren<Transform>();
             if (transform != null)
                 transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+            _object.LeftSide = true;
         }
         //Debug.Log("SetEngine");
     }

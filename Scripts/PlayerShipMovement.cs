@@ -2,33 +2,44 @@ using UnityEngine;
 using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(AudioSource))]
 // [ExecuteAlways]
 public class PlayerShipMovement : MonoBehaviour
 {
     [Header("Main Attributes")]
-    [SerializeField][Range(0, 25)] private float maxSpeed = 5;
-    [SerializeField][Range(0, 50)] private float accelerationValue = 0;
-    public float Acceleration
-    {
-        get => accelerationValue;
-        set
-        {
-            accelerationValue = value;
-            DefineAcceleration();
-        }
-    }
-    [SerializeField][Range(0.01f, 1f)] private float mobility = 0.6f;
-    public float Mobility { get => mobility; set { mobility = value; DefineMobility(); } }
+    [SerializeField] private ShipConfiguration shipConfiguration;
     [SerializeField] private Camera _camera;
+
+
+    [Header("Engine Sound")]
+    [SerializeField] private AudioClip audioEngineSound;
+    private AudioSource audioEngineSource;
+
 
     [Header("Log Attributes")]
     //Log
     [SerializeField] private bool LogDrawLinesDirection = true;
     //Log
 
-    [SerializeField] // Log
+
+    [SerializeField][Range(0, 10)] private float maxSpeed = 0;
+
+
+    [Range(0, 20)] private float pullEnginesPower = 0;
+    public float PullEnginesPower
+    {
+        get => pullEnginesPower;
+        set { pullEnginesPower = value; DefineAcceleration(); }
+    }
+    [SerializeField]
     private float acceleration = 0;
+
+
+    [Range(0.01f, 1f)] private float mobility = 0;
+    public float Mobility { get => mobility; set { mobility = value; DefineMobility(); } }
+    [SerializeField]
     private float rotateMobility = 0;
+
 
     private Rigidbody2D rb;
     private Vector2 mousePosition;
@@ -46,9 +57,19 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void Awake()
     {
+        if (shipConfiguration == null)
+            throw new NullReferenceException("shipConfiguration equals null");
+
         rb = GetComponent<Rigidbody2D>();
+        audioEngineSource = GetComponent<AudioSource>();
 
         DefineFields();
+    }
+
+    private void ChangeEngineValues(bool value)
+    {
+        for (int i = 0; i < shipConfiguration.engines.Count; i++)
+            shipConfiguration.engines[i].Animator.SetBool("isMoving", value);
     }
 
     private void OnEnable()
@@ -87,7 +108,13 @@ public class PlayerShipMovement : MonoBehaviour
         DefineMobility();
     }
 
-    private void DefineAcceleration() => acceleration = accelerationValue / maxSpeed;
+    private void DefineAcceleration()
+    {
+        if (pullEnginesPower == 0 || maxSpeed == 0)
+            acceleration = 0;
+        else
+            acceleration = pullEnginesPower / maxSpeed;
+    }
 
     private void DefineMobility()
     {
@@ -128,9 +155,15 @@ public class PlayerShipMovement : MonoBehaviour
     {
         lerp += Time.deltaTime;
         if (moveXraw == 0 && moveYraw == 0)
+        {
+            ChangeEngineValues(false);
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration / factorDecreaseSpeed);
+        }
         else
+        {
+            ChangeEngineValues(true);
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration);
+        }
 
         rb.velocity = new Vector2(moveDirection.x * maxSpeed, moveDirection.y * maxSpeed);
     }
@@ -150,10 +183,10 @@ public class PlayerShipMovement : MonoBehaviour
         lerp = 0;
     }
 
-    public void UpdateValues(float maxSpeed, float acceleration, float mobility)
+    public void UpdateValues(float maxSpeed, float pullEnginesPower, float mobility)
     {
         this.maxSpeed = maxSpeed;
-        Acceleration = acceleration;
+        PullEnginesPower = pullEnginesPower;
         Mobility = mobility;
     }
 

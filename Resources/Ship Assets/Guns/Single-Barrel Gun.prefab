@@ -858,7 +858,7 @@ MonoBehaviour:
   accuracy: 0.8
   timeReload: 0
   leftSide: 0
-  fireRate: 450
+  fireRate: 400
   fireAnimator: {fileID: 1166742470136003454}
   audioFires:
   - {fileID: 1345186975177757820}

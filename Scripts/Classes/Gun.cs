@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Unity.Collections;
 using UnityEditor.Animations;
 using UnityEngine;
 
@@ -20,8 +21,6 @@ public class Gun : ItemShip
         }
     }
     [SerializeField] private float timeReload;
-    [SerializeField] private bool leftSide = false;
-
 
     [Header("Fire rate in minutte")]
     [SerializeField][Range(1, 5400)] private float fireRate;
@@ -34,6 +33,7 @@ public class Gun : ItemShip
     [SerializeField] private AudioSource[] audioFires;
     [SerializeField] private AudioClip audioClipFire;
     public AudioSource[] AudioFires { get => audioFires; }
+
 
     [Header("Additional Settings")]
     [SerializeField] private bool chamber = false;
@@ -57,6 +57,7 @@ public class Gun : ItemShip
     private Transform transformChamber;
     private const float maxAngleGunSpread = 10;
     private const float maxAngleSleeveRotate = 20;
+    private const string layerFireAnimatorName = "Base Layer";
 
     static float randomSeed = 456;
 
@@ -83,15 +84,24 @@ public class Gun : ItemShip
     private void ChangeSpeedFireAnimation()
     {
         AnimatorController ac = fireAnimator.runtimeAnimatorController as AnimatorController;
-        ChildAnimatorState[] cas = ac.layers[fireAnimator.GetLayerIndex("Base Layer")].stateMachine.states.Where(x => x.state.tag == "Fire").ToArray();
-        foreach (var item in cas)
-            item.state.speed = ReturnAnimationSpeed();
+        int index = fireAnimator.GetLayerIndex(layerFireAnimatorName);
+        if (index != -1)
+        {
+            ChildAnimatorState[] cas = ac.layers[index].stateMachine.states.Where(x => x.state.tag == "Fire").ToArray();
+            if (cas != null)
+            {
+                float animSpeed = ReturnAnimationSpeed();
+                foreach (var item in cas)
+                    item.state.speed = animSpeed;
+            }
+        }
+
 
         float ReturnAnimationSpeed()
         {
             if (fireRate <= 600)
-                return 3;
-            else return fireRate / 200;
+                return 4;
+            else return fireRate / 150;
         }
     }
 
@@ -229,7 +239,7 @@ public class Gun : ItemShip
 
         Vector3 sleeveVectorEuler = sleeveObject.transform.eulerAngles;
 
-        float angleRotateShift = sleeveVectorEuler.z - 90 * (_ = leftSide == true ? -1 : 1) * Random(0f, -0.25f);
+        float angleRotateShift = -sleeveVectorEuler.z - 90 * (_ = LeftSide == true ? -1 : 1) * Random(0f, -0.25f);
         if (angleRotateShift > 360) angleRotateShift -= 360;
         else if (angleRotateShift < 0) angleRotateShift += 360;
         float radian = angleRotateShift * Mathf.Deg2Rad;

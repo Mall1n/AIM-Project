@@ -12,4 +12,8 @@ public abstract class ItemShip : Item
         EasyGun = 2,
         HeavyGun = 3
     }
+
+    [SerializeField] private protected bool leftSide = false;
+    public bool LeftSide { get => leftSide; set => leftSide = value; }
+
 }

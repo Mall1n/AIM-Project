@@ -6,19 +6,19 @@ public class ItemID
     {
         Unknown = 0,
         FirstEngine = 1,
-        FirstEngineTest = 2
+        IonEngine = 2
     }
 
     public static List<string> PathToEngines = new List<string>(){
                                                                     "",
-                                                                    "Ship Assets/Engines/First Engine",
-                                                                    "Ship Assets/Engines/First Engine Test"
+                                                                    "Ship Assets/Engines/Single-Plasma Engine",
+                                                                    "Ship Assets/Engines/Ion Engine"
                                                                 };
 
     public enum EasyGun : int
     {
         Unknown = 0,
-        Single_Barrel = 1,
+        SingleBarrel = 1,
     }
 
     public static List<string> PathToEasyGuns = new List<string>(){
