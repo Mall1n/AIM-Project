@@ -189,10 +189,10 @@ MonoBehaviour:
   name: Single Plasma Engine
   mass: 40
   itemType: 1
-  leftSide: 0
+  itemSide: 0
   power: 40
   energyUsage: 20
-  animator: {fileID: 4818362787984426679}
+  animatorEngineFire: {fileID: 4818362787984426679}
 --- !u!4 &4869621999603878454 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4617928708732413916, guid: 2a4c618c1193382439d3fa74213a5533, type: 3}

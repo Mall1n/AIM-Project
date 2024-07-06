@@ -15,18 +15,18 @@ public class ShipConfigurationEditor : Editor
 
 
     // ENGINES
-    private List<Engine> engines;
-    private List<Transform> transformEngines;
+    private Engine[] engines;
+    private Transform[] transformsEngine;
     private List<int> IDEngines;
 
     // EASY GUNS
-    private List<Gun> easyGuns;
-    private List<Transform> transformEasyGuns;
+    private Gun[] easyGuns;
+    private Transform[] transformsEasyGun;
     private List<int> IDEasyGuns;
 
-    //EASY GUNS
-    private List<Gun> heavyGuns;
-    private List<Transform> transformHeavyGuns;
+    // EASY GUNS
+    private Gun[] heavyGuns;
+    private Transform[] transformsHeavyGun;
     private List<int> IDHeavyGuns;
 
 
@@ -45,6 +45,8 @@ public class ShipConfigurationEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        // UpdateValues();
+
         ShowEditor();
 
         ShowDefaultInspector();
@@ -78,95 +80,43 @@ public class ShipConfigurationEditor : Editor
 
     private void DrawEditorInspector()
     {
-        ShowParameters<Engine, int, ItemID.Engine>("Add Engine", "Remove Engine",
-        ref shipConfiguration.engines, ref shipConfiguration.transformsEngines, ref shipConfiguration.IDEngines,
-        ref engines, ref transformEngines, ref IDEngines, ItemShip.Type.Engine, ItemID.PathToEngines);
+        ShowParameters<Engine, int, ItemID.Engine>(
+        ref shipConfiguration.engines, ref shipConfiguration.transformsEngine, ref shipConfiguration.IDEngines,
+        ref engines, ref transformsEngine, ref IDEngines,
+        ItemShip.Type.Engine, ItemID.PathToEngines);
 
         GUILayout.Space(10);
 
-        ShowParameters<Gun, int, ItemID.EasyGun>("Add Easy Gun", "Remove Easy Gun",
-        ref shipConfiguration.easyGuns, ref shipConfiguration.transformEasyGuns, ref shipConfiguration.IDEasyGuns,
-        ref easyGuns, ref transformEasyGuns, ref IDEasyGuns, ItemShip.Type.EasyGun, ItemID.PathToEasyGuns);
+        ShowParameters<Gun, int, ItemID.EasyGun>(
+        ref shipConfiguration.easyGuns, ref shipConfiguration.transformsEasyGun, ref shipConfiguration.IDEasyGuns,
+        ref easyGuns, ref transformsEasyGun, ref IDEasyGuns,
+        ItemShip.Type.EasyGun, ItemID.PathToEasyGuns);
 
         GUILayout.Space(10);
 
-        ShowParameters<Gun, int, ItemID.EasyGun>("Add Heavy Gun", "Remove Heavy Gun",
-        ref shipConfiguration.heavyGuns, ref shipConfiguration.transformHeavyGuns, ref shipConfiguration.IDHeavyGuns,
-        ref heavyGuns, ref transformHeavyGuns, ref IDHeavyGuns, ItemShip.Type.HeavyGun, ItemID.PathToHeavyGuns);
+        ShowParameters<Gun, int, ItemID.HeavyGun>(
+        ref shipConfiguration.heavyGuns, ref shipConfiguration.transformsHeavyGun, ref shipConfiguration.IDHeavyGuns,
+        ref heavyGuns, ref transformsHeavyGun, ref IDHeavyGuns,
+        ItemShip.Type.HeavyGun, ItemID.PathToHeavyGuns);
     }
 
-    private void ShowParameters<T, V, U>(string addButtonText, string removeButtonText,
-    ref List<T> shipParts, ref List<Transform> shipPartTransforms, ref List<V> shipIDParts,
-    ref List<T> thisShipParts, ref List<Transform> thisShipPartTransforms, ref List<V> thisShipIDParts,
+    private void ShowParameters<T, V, U>(
+    ref T[] shipParts, ref Transform[] shipPartTransforms, ref List<V> shipIDParts,
+    ref T[] thisShipParts, ref Transform[] thisShipPartTransforms, ref List<V> thisShipIDParts,
     ItemShip.Type typeOfPartShipTarget, List<string> PathToObjects)
     where T : ItemShip
     where V : struct
     where U : Enum
     {
         GUILayout.BeginVertical(EditorStyles.helpBox);
-        GUILayout.BeginHorizontal();
 
-        EditorGUI.BeginChangeCheck();
-        GUILayout.Button(addButtonText);
-        if (EditorGUI.EndChangeCheck())
-        {
-            Undo.RecordObject(shipConfiguration, addButtonText);
-            shipParts.Add(null);
-            shipPartTransforms.Add(null);
-            shipIDParts.Add((V)(object)0);
-            UpdateValues();
-        }
-
-        EditorGUI.BeginChangeCheck();
-        GUILayout.Button(removeButtonText);
-        if (EditorGUI.EndChangeCheck())
-        {
-            int index = shipPartTransforms.Count;
-            if (index != 0)
-            {
-                Undo.RegisterFullObjectHierarchyUndo(shipConfiguration.gameObject, removeButtonText);
-                index -= 1;
-                if (shipPartTransforms[index] != null && (int)(object)shipIDParts[index] != 0)
-                    DestroyObject<T>(shipPartTransforms[index].GetComponentInChildren<T>()?.gameObject, index, ref shipParts);
-                shipParts.RemoveAt(index);
-                shipPartTransforms.RemoveAt(index);
-                shipIDParts.RemoveAt(index);
-                UpdateValues();
-            }
-        }
-
-        GUILayout.EndHorizontal();
-
-        for (int i = 0; i < thisShipPartTransforms.Count; i++)
+        for (int i = 0; i < thisShipPartTransforms.Length; i++)
         {
             GUILayout.BeginHorizontal(EditorStyles.helpBox);
             GUILayout.BeginVertical();
-            EditorGUI.BeginChangeCheck();
 
             thisShipPartTransforms[i] = (Transform)EditorGUILayout.ObjectField(shipPartTransforms[i], typeof(Transform), true);
             Transform partTransform = thisShipPartTransforms[i];
-            if (EditorGUI.EndChangeCheck())
-            {
-                if (partTransform != null)
-                {
-                    ShipSpot itemPart = partTransform.GetComponent<ShipSpot>();
-                    if (itemPart != null && itemPart.Type == typeOfPartShipTarget
-                        && !shipPartTransforms.Contains(partTransform) && (int)(object)thisShipIDParts[i] == 0)
-                    {
-                        Undo.RegisterCompleteObjectUndo(shipConfiguration, $"Transform set");
-                        shipPartTransforms[i] = partTransform;
-                    }
-                }
-                else if (shipPartTransforms[i] != null)
-                {
-                    Undo.RegisterFullObjectHierarchyUndo(shipConfiguration.gameObject, $"Transform delete");
-                    DestroyObject<T>(shipPartTransforms[i].GetComponentInChildren<T>()?.gameObject, i, ref shipParts);
-                    shipIDParts[i] = (V)(object)ItemID.Engine.Unknown;
-                    shipPartTransforms[i] = null;
-                }
-                UpdateValues();
-            }
-
             if (partTransform != null)
             {
                 EditorGUI.BeginChangeCheck();
@@ -186,7 +136,7 @@ public class ShipConfigurationEditor : Editor
                                 DestroyObject<T>(previousObject, i, ref shipParts);
 
                             ShipSpot itemPart = partTransform.GetComponent<ShipSpot>();
-                            SetObject<T>(LoadedPrefab, thisShipPartTransforms[i], i, ref shipParts, (itemPart != null && itemPart.LeftSide == true));
+                            SetObject<T>(LoadedPrefab, thisShipPartTransforms[i], i, ref shipParts, itemPart.Side);
                             shipIDParts[i] = thisShipIDParts[i];
                         }
                     }
@@ -207,52 +157,50 @@ public class ShipConfigurationEditor : Editor
         GUILayout.EndHorizontal();
     }
 
-    // private void TryDestroyObject<T>(GameObject gameObject, int indexEngine, ref List<T> targetList) where T : ItemShip
-    // {
-    //     if (gameObject != null)
-
-    // }
-
-    private void DestroyObject<T>(GameObject gameObject, int indexEngine, ref List<T> targetList) where T : ItemShip
+    private void DestroyObject<T>(GameObject gameObject, int indexEngine, ref T[] targetList) where T : ItemShip
     {
-        //if (gameObject == null) return;
-
         DestroyImmediate(gameObject);
         targetList[indexEngine] = null;
-        // Debug.Log("Destroy");
     }
 
-    private void SetObject<T>(GameObject instantObject, Transform parent, int indexEngine, ref List<T> targetList, bool scaleReverse) where T : ItemShip
+    private void SetObject<T>(GameObject instantObject, Transform parent, int indexEngine, ref T[] targetList, ItemShip.Side side) where T : ItemShip
     {
         if (instantObject == null || parent == null) return;
 
         UnityEngine.Object prefab = PrefabUtility.InstantiatePrefab(instantObject, parent);
         T _object = parent.GetComponentInChildren<T>();
         targetList[indexEngine] = _object;
-        if (scaleReverse)
+
+        _object.ItemSide = side;
+        if ((int)side == 1)
         {
             Transform transform = prefab.GetComponentInChildren<Transform>();
             if (transform != null)
                 transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-            _object.LeftSide = true;
         }
-        //Debug.Log("SetEngine");
     }
 
     private void UpdateValues()
     {
-        engines = new List<Engine>(shipConfiguration.engines);
-        transformEngines = new List<Transform>(shipConfiguration.transformsEngines);
+        engines = new Engine[shipConfiguration.engines.Length];
+        shipConfiguration.engines.CopyTo(engines, 0);
+        transformsEngine = new Transform[shipConfiguration.transformsEngine.Length];
+        shipConfiguration.transformsEngine.CopyTo(transformsEngine, 0);
         IDEngines = new List<int>(shipConfiguration.IDEngines);
 
-        easyGuns = new List<Gun>(shipConfiguration.easyGuns);
-        transformEasyGuns = new List<Transform>(shipConfiguration.transformEasyGuns);
+        easyGuns = new Gun[shipConfiguration.easyGuns.Length];
+        shipConfiguration.easyGuns.CopyTo(easyGuns, 0);
+        transformsEasyGun = new Transform[shipConfiguration.transformsEasyGun.Length];
+        shipConfiguration.transformsEasyGun.CopyTo(transformsEasyGun, 0);
         IDEasyGuns = new List<int>(shipConfiguration.IDEasyGuns);
 
-        heavyGuns = new List<Gun>(shipConfiguration.heavyGuns);
-        transformHeavyGuns = new List<Transform>(shipConfiguration.transformHeavyGuns);
+        heavyGuns = new Gun[shipConfiguration.heavyGuns.Length];
+        shipConfiguration.heavyGuns.CopyTo(heavyGuns, 0);
+        transformsHeavyGun = new Transform[shipConfiguration.transformsHeavyGun.Length];
+        shipConfiguration.transformsHeavyGun.CopyTo(transformsHeavyGun, 0);
         IDHeavyGuns = new List<int>(shipConfiguration.IDHeavyGuns);
         //Debug.Log("UpdateValues");
+
         showDefaultInspector = shipConfiguration.showDefaultInspector;
         showEditor = shipConfiguration.showEditor;
     }

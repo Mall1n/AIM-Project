@@ -10,13 +10,32 @@ public class ShipConfiguration : MonoBehaviour
     //[SerializeField] private PlayerShipMovement playerShipMovement;
     //[SerializeField] private float mass = 0;
     [SerializeField][Range(0, 1)] private float mobility;
-    public List<Engine> engines; // make private
-    public List<Gun> easyGuns; // make private
-    public List<Gun> heavyGuns; // make private
+    public Transform[] transformsEngine;
+    public Engine[] engines; // make private
+    public Transform[] transformsEasyGun;
+    public Gun[] easyGuns; // make private
+    public Transform[] transformsHeavyGun;
+    public Gun[] heavyGuns; // make private
     [SerializeField] private Item[] inventory;
     private float fullMass = 0;
 
+
+
+    private float health = 0.0f;
+
     public static Action<float, float, float> onChangedMovementValues;
+    public static Action<float> onChangedHealth;
+
+
+    private void Start()
+    {
+        //UpdateEmptyLists();
+
+        fullMass = GetFullShipMass();
+        FullSetShipValues();
+
+        SetHealth(50);
+    }
 
     public void SetInventoryCapacity(int capacity)
     {
@@ -32,30 +51,22 @@ public class ShipConfiguration : MonoBehaviour
     public bool showDefaultInspector = true;
     public bool showEditor = true;
 
-    // FOR ENGINE
-    public List<Transform> transformsEngines;
+    // // FOR ENGINE
+    // public List<Transform> transformsEngines;
     public List<int> IDEngines;
 
-    // FOR EASY GUNS
-    public List<Transform> transformEasyGuns;
+    // // FOR EASY GUNS
+    // public List<Transform> transformEasyGuns;
     public List<int> IDEasyGuns;
 
-    // FOR HEAVY GUNS
-    public List<Transform> transformHeavyGuns;
+    // // FOR HEAVY GUNS
+    // public List<Transform> transformHeavyGuns;
     public List<int> IDHeavyGuns;
 
 #endif
 
 
-    private void Start()
-    {
-        UpdateEmptyLists();
-
-        fullMass = GetFullShipMass();
-        FullDefineShipValues();
-    }
-
-    public void FullDefineShipValues()
+    public void FullSetShipValues()
     {
         float powerEngines = GetPowerEngines();
 
@@ -64,7 +75,7 @@ public class ShipConfiguration : MonoBehaviour
         float _powerEngines = powerEngines / 25;
         _powerEngines -= _powerEngines * fullMass / 10000;
 
-        float _mobility = mobility - (mobility * fullMass / 10000);
+        float _mobility = mobility - (mobility * fullMass / 10000); // добавить зависимость от грузоподъёмности
 
         onChangedMovementValues?.Invoke(maxSpeed, _powerEngines, _mobility);
     }
@@ -79,14 +90,22 @@ public class ShipConfiguration : MonoBehaviour
         return mass;
     }
 
-    private void DeleteEmpty<T>(List<T> list) => list.RemoveAll(s => s == null);
 
-    private void UpdateEmptyLists()
+    public void SetAnimatorsEngineFire(bool value)
     {
-        DeleteEmpty(engines);
-        DeleteEmpty(easyGuns);
-        DeleteEmpty(heavyGuns);
+        for (int i = 0; i < engines.Length; i++)
+            if (engines[i] != null)
+                engines[i].SetAnimatorEngineFire(value);
     }
+
+    // private void DeleteEmpty<T>(List<T> list) => list.RemoveAll(s => s == null);
+
+    // private void UpdateEmptyLists()
+    // {
+    //     DeleteEmpty(engines);
+    //     DeleteEmpty(easyGuns);
+    //     DeleteEmpty(heavyGuns);
+    // }
 
     public float GetPowerEngines()
     {
@@ -99,6 +118,12 @@ public class ShipConfiguration : MonoBehaviour
             result += item.Power;
         }
         return result;
+    }
+
+    private void SetHealth(float _health)
+    {
+        health = _health;
+        onChangedHealth?.Invoke(_health);
     }
 
 }

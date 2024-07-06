@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles/PlayerUI.uss?fileID=7433441132597879392&amp;guid=d2217b4ab0895334198e41acb45e6bb8&amp;type=3#PlayerUI" />
+    <ui:VisualElement name="EntireScreen" class="entire-screen" style="flex-grow: 1;">
+        <ui:VisualElement name="UpperLeft" class="upper-left">
+            <ui:ProgressBar value="34.5" title="Shield" name="Shield" class="player-bar" />
+            <ui:ProgressBar value="34.5" title="Energy" name="Energy" class="player-bar" />
+            <ui:ProgressBar value="34.5" title="Health" name="Health" class="player-bar" />
+        </ui:VisualElement>
+        <ui:VisualElement style="padding-top: 100px; padding-right: 100px; padding-bottom: 100px; padding-left: 100px; position: absolute; left: 30%; top: 30%; right: 30%; bottom: 30%; background-color: rgb(255, 255, 255); opacity: 0;" />
+    </ui:VisualElement>
+</ui:UXML>

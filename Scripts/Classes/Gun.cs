@@ -9,7 +9,7 @@ public class Gun : ItemShip
     [Header("Main Stats")]
     [SerializeField] private Bullet.Type barrelType;
     [SerializeField][Range(1, 5)] private int levelUpgrage = 1;
-    [SerializeField] private float energyUsage;
+    [SerializeField] private float energyUsage = 0.0f;
     [SerializeField][Range(0, 1)] private float accuracy = 0.9f;
     public float Accuracy
     {
@@ -33,6 +33,7 @@ public class Gun : ItemShip
     [SerializeField] private AudioSource[] audioFires;
     [SerializeField] private AudioClip audioClipFire;
     public AudioSource[] AudioFires { get => audioFires; }
+    [SerializeField][Range(0, 1)] private float volumeModifier = 1.0f;
 
 
     [Header("Additional Settings")]
@@ -68,6 +69,8 @@ public class Gun : ItemShip
 
     void Start()
     {
+        SetVolumeModifier();
+        
         FindEndBurrel();
 
         SetAudioClipsInAudioSourses();
@@ -79,6 +82,12 @@ public class Gun : ItemShip
         LoadResources();
 
         ChangeSpeedFireAnimation();
+    }
+
+    private void SetVolumeModifier()
+    {
+        for (int i = 0; i < audioFires.Length; i++)
+            audioFires[i].volume *= volumeModifier;
     }
 
     private void ChangeSpeedFireAnimation()
@@ -107,7 +116,7 @@ public class Gun : ItemShip
 
     private void LoadResources()
     {
-        LoadBulletInGun("Ship Assets/Bullets/AP 13.45");
+        LoadBulletInGun("Ship Assets/Bullets/CB 13.45"); // make dynamic
 
         if (chamber)
         {
@@ -115,7 +124,7 @@ public class Gun : ItemShip
             if (transformChamber == null)
                 chamber = false;
             else
-                LoadSleeveInGun("Ship Assets/Bullets/CB 13.45 sleeve");
+                LoadSleeveInGun("Ship Assets/Bullets/CB 13.45 sleeve"); // make dynamic
         }
     }
 
@@ -238,8 +247,7 @@ public class Gun : ItemShip
         float angelRotate = randomSeed = maxAngleSleeveRotate * Random(-1f, 1f);
 
         Vector3 sleeveVectorEuler = sleeveObject.transform.eulerAngles;
-
-        float angleRotateShift = -sleeveVectorEuler.z - 90 * (_ = LeftSide == true ? -1 : 1) * Random(0f, -0.25f);
+        float angleRotateShift = -sleeveVectorEuler.z - 90 * (_ = ItemSide == ItemShip.Side.Left ? -1 : 1) * Random(0f, -0.25f); // check
         if (angleRotateShift > 360) angleRotateShift -= 360;
         else if (angleRotateShift < 0) angleRotateShift += 360;
         float radian = angleRotateShift * Mathf.Deg2Rad;

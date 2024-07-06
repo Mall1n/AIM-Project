@@ -68,8 +68,7 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void ChangeEngineValues(bool value)
     {
-        for (int i = 0; i < shipConfiguration.engines.Count; i++)
-            shipConfiguration.engines[i].Animator.SetBool("isMoving", value);
+        shipConfiguration.SetAnimatorsEngineFire(value);
     }
 
     private void OnEnable()

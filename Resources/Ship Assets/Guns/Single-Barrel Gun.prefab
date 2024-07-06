@@ -852,12 +852,12 @@ MonoBehaviour:
   name: Single-Barrel Gun
   mass: 20
   itemType: 2
+  itemSide: 0
   barrelType: 1
   levelUpgrage: 1
   energyUsage: 5
   accuracy: 0.8
   timeReload: 0
-  leftSide: 0
   fireRate: 400
   fireAnimator: {fileID: 1166742470136003454}
   audioFires:
@@ -867,6 +867,7 @@ MonoBehaviour:
   - {fileID: 7132284085297019755}
   - {fileID: 3302540323811636921}
   audioClipFire: {fileID: 8300000, guid: e3e44d700e90f0d43b2ff5afc98bcee1, type: 3}
+  volumeModifier: 0.5
   chamber: 1
 --- !u!4 &7160856057258584108 stripped
 Transform:

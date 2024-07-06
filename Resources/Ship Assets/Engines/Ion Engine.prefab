@@ -189,10 +189,10 @@ MonoBehaviour:
   name: Ion Engine
   mass: 30
   itemType: 1
-  leftSide: 0
+  itemSide: 0
   power: 50
   energyUsage: 40
-  animator: {fileID: 4392772781951121954}
+  animatorEngineFire: {fileID: 4392772781951121954}
 --- !u!4 &9027550665356055707 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4617928708732413916, guid: 6f07506d5b3535a4b833b5d250968a6b, type: 3}

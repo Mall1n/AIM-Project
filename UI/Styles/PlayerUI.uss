@@ -1,0 +1,30 @@
+.entire-screen {
+    font-size: 16px;
+    -unity-font-definition: initial;
+    -unity-font: url('project://database/Assets/UI/Fonts/Montserrat/Montserrat-Light.ttf?fileID=12800000&guid=927357c6695d2ca4aaa5ad0c95e2f3be&type=3#Montserrat-Light');
+}
+
+.upper-left {
+    opacity: 0.7;
+    align-self: flex-start;
+}
+
+.player-bar {
+    width: 500px;
+    margin-left: 10px;
+    padding-top: 7px;
+
+}
+
+.unity-progress-bar__background {
+    background-color: rgba(255, 255, 255, 0);
+    border-width: 0;
+}
+
+.unity-progress-bar__title-container {
+    color: rgb(255, 255, 255);
+}
+
+.unity-progress-bar__progress {
+    background-image: resource('Sprites/UI/Bar');
+}
