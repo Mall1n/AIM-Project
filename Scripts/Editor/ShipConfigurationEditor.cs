@@ -15,19 +15,22 @@ public class ShipConfigurationEditor : Editor
 
 
     // ENGINES
-    private Engine[] engines;
+    //private Engine[] engines;
     private Transform[] transformsEngine;
     private List<int> IDEngines;
 
     // EASY GUNS
-    private Gun[] easyGuns;
+    //private Gun[] easyGuns;
     private Transform[] transformsEasyGun;
     private List<int> IDEasyGuns;
 
     // EASY GUNS
-    private Gun[] heavyGuns;
+    //private Gun[] heavyGuns;
     private Transform[] transformsHeavyGun;
     private List<int> IDHeavyGuns;
+
+    // SHIELDS
+    private int IDShield;
 
 
 
@@ -82,27 +85,34 @@ public class ShipConfigurationEditor : Editor
     {
         ShowParameters<Engine, int, ItemID.Engine>(
         ref shipConfiguration.engines, ref shipConfiguration.transformsEngine, ref shipConfiguration.IDEngines,
-        ref engines, ref transformsEngine, ref IDEngines,
+        ref transformsEngine, ref IDEngines,
         ItemShip.Type.Engine, ItemID.PathToEngines);
 
         GUILayout.Space(10);
 
         ShowParameters<Gun, int, ItemID.EasyGun>(
         ref shipConfiguration.easyGuns, ref shipConfiguration.transformsEasyGun, ref shipConfiguration.IDEasyGuns,
-        ref easyGuns, ref transformsEasyGun, ref IDEasyGuns,
+        ref transformsEasyGun, ref IDEasyGuns,
         ItemShip.Type.EasyGun, ItemID.PathToEasyGuns);
 
         GUILayout.Space(10);
 
         ShowParameters<Gun, int, ItemID.HeavyGun>(
         ref shipConfiguration.heavyGuns, ref shipConfiguration.transformsHeavyGun, ref shipConfiguration.IDHeavyGuns,
-        ref heavyGuns, ref transformsHeavyGun, ref IDHeavyGuns,
+        ref transformsHeavyGun, ref IDHeavyGuns,
         ItemShip.Type.HeavyGun, ItemID.PathToHeavyGuns);
+
+        GUILayout.Space(10);
+
+        ShowParameters<Shield, int, ItemID.Shiled>(
+        ref shipConfiguration.shield, ref shipConfiguration.IDShield,
+        ref IDShield,
+        ItemShip.Type.Shield, ItemID.PathToShields);
     }
 
     private void ShowParameters<T, V, U>(
     ref T[] shipParts, ref Transform[] shipPartTransforms, ref List<V> shipIDParts,
-    ref T[] thisShipParts, ref Transform[] thisShipPartTransforms, ref List<V> thisShipIDParts,
+    ref Transform[] thisShipPartTransforms, ref List<V> thisShipIDParts,
     ItemShip.Type typeOfPartShipTarget, List<string> PathToObjects)
     where T : ItemShip
     where V : struct
@@ -157,6 +167,42 @@ public class ShipConfigurationEditor : Editor
         GUILayout.EndHorizontal();
     }
 
+    private void ShowParameters<T, V, U>(
+    ref T shipPart, ref V shipIDPart,
+    ref V thisShipIDPart,
+    ItemShip.Type typeOfPartShipTarget, List<string> PathToObjects)
+    where T : ItemShip
+    where V : struct
+    where U : Enum
+    {
+        GUILayout.BeginVertical(EditorStyles.helpBox);
+
+        EditorGUI.BeginChangeCheck();
+        thisShipIDPart = (V)(object)EditorGUILayout.EnumPopup((U)(object)shipIDPart);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RegisterFullObjectHierarchyUndo(shipConfiguration.gameObject, $"Change Engine Type");
+            int idPart = (int)(object)thisShipIDPart;
+            if (idPart != 0)
+            {
+                GameObject LoadedPrefab = Resources.Load(PathToObjects[idPart], typeof(GameObject)) as GameObject;
+                T componentT = LoadedPrefab.GetComponent<T>();
+                if (componentT != null && componentT.ItemType == typeOfPartShipTarget)
+                {
+                    shipPart = componentT;
+                    shipIDPart = thisShipIDPart;
+                }
+            }
+            else if (idPart == 0)
+            {
+                shipPart = null;
+                shipIDPart = thisShipIDPart;
+            }
+        }
+
+        GUILayout.EndHorizontal();
+    }
+
     private void DestroyObject<T>(GameObject gameObject, int indexEngine, ref T[] targetList) where T : ItemShip
     {
         DestroyImmediate(gameObject);
@@ -182,24 +228,26 @@ public class ShipConfigurationEditor : Editor
 
     private void UpdateValues()
     {
-        engines = new Engine[shipConfiguration.engines.Length];
-        shipConfiguration.engines.CopyTo(engines, 0);
+        // engines = new Engine[shipConfiguration.engines.Length];
+        // shipConfiguration.engines.CopyTo(engines, 0);
         transformsEngine = new Transform[shipConfiguration.transformsEngine.Length];
         shipConfiguration.transformsEngine.CopyTo(transformsEngine, 0);
         IDEngines = new List<int>(shipConfiguration.IDEngines);
 
-        easyGuns = new Gun[shipConfiguration.easyGuns.Length];
-        shipConfiguration.easyGuns.CopyTo(easyGuns, 0);
+        // easyGuns = new Gun[shipConfiguration.easyGuns.Length];
+        // shipConfiguration.easyGuns.CopyTo(easyGuns, 0);
         transformsEasyGun = new Transform[shipConfiguration.transformsEasyGun.Length];
         shipConfiguration.transformsEasyGun.CopyTo(transformsEasyGun, 0);
         IDEasyGuns = new List<int>(shipConfiguration.IDEasyGuns);
 
-        heavyGuns = new Gun[shipConfiguration.heavyGuns.Length];
-        shipConfiguration.heavyGuns.CopyTo(heavyGuns, 0);
+        // heavyGuns = new Gun[shipConfiguration.heavyGuns.Length];
+        // shipConfiguration.heavyGuns.CopyTo(heavyGuns, 0);
         transformsHeavyGun = new Transform[shipConfiguration.transformsHeavyGun.Length];
         shipConfiguration.transformsHeavyGun.CopyTo(transformsHeavyGun, 0);
         IDHeavyGuns = new List<int>(shipConfiguration.IDHeavyGuns);
         //Debug.Log("UpdateValues");
+
+        IDShield = shipConfiguration.IDShield;
 
         showDefaultInspector = shipConfiguration.showDefaultInspector;
         showEditor = shipConfiguration.showEditor;

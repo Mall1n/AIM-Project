@@ -86,6 +86,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d0973a57e6a3def49a9ee38268e9dca3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 599864556687800069}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d0973a57e6a3def49a9ee38268e9dca3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5696965669610894147}
   m_SourcePrefab: {fileID: 100100000, guid: d0973a57e6a3def49a9ee38268e9dca3, type: 3}
 --- !u!1 &3209702376511337746 stripped
 GameObject:
@@ -132,7 +135,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   name: AP 13.45
-  mass: 0.015
+  mass: 0.0015
   speed: 12
   damage: 15
   "bullet\u0421aliber": 1
+--- !u!61 &5696965669610894147
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3209702376511337746}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.008133866}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.016771471, y: 0.08035063}
+  m_EdgeRadius: 0

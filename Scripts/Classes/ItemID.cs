@@ -38,6 +38,17 @@ public class ItemID
                                                                 };
 
 
+    public enum Shiled : int
+    {
+        Unknown = 0,
+        MonoShield = 1
+    }
+
+    public static List<string> PathToShields = new List<string>(){
+                                                                    "",
+                                                                    "Ship Assets/Shields/Mono Shield",
+                                                                };
+
 }
 
 

@@ -11,9 +11,9 @@ public class PlayerShipMovement : MonoBehaviour
     [SerializeField] private Camera _camera;
 
 
-    [Header("Engine Sound")]
-    [SerializeField] private AudioClip audioEngineSound;
-    private AudioSource audioEngineSource;
+    // [Header("Engine Sound")]
+    // [SerializeField] private AudioClip audioEngineSound;
+    // private AudioSource audioEngineSource;
 
 
     [Header("Log Attributes")]
@@ -23,6 +23,8 @@ public class PlayerShipMovement : MonoBehaviour
 
 
     [SerializeField][Range(0, 10)] private float maxSpeed = 0;
+    [SerializeField]float inertiaFactor = 0.1f;
+
 
 
     [Range(0, 20)] private float pullEnginesPower = 0;
@@ -33,15 +35,20 @@ public class PlayerShipMovement : MonoBehaviour
     }
     [SerializeField]
     private float acceleration = 0;
+    public float Acceleration { get => acceleration; }
 
 
     [Range(0.01f, 1f)] private float mobility = 0;
     public float Mobility { get => mobility; set { mobility = value; DefineMobility(); } }
+
+
     [SerializeField]
     private float rotateMobility = 0;
 
 
     private Rigidbody2D rb;
+    public Rigidbody2D Rb { get => rb; }
+
     private Vector2 mousePosition;
     private Vector2 moveDirection_Raw;
     private Vector2 moveDirection;
@@ -61,7 +68,7 @@ public class PlayerShipMovement : MonoBehaviour
             throw new NullReferenceException("shipConfiguration equals null");
 
         rb = GetComponent<Rigidbody2D>();
-        audioEngineSource = GetComponent<AudioSource>();
+        //audioEngineSource = GetComponent<AudioSource>();
 
         DefineFields();
     }
@@ -73,12 +80,12 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        ShipConfiguration.onChangedMovementValues += UpdateValues;
+        ShipConfiguration.onChangedShipValues += UpdateValues;
     }
 
     private void OnDisable()
     {
-        ShipConfiguration.onChangedMovementValues -= UpdateValues;
+        ShipConfiguration.onChangedShipValues -= UpdateValues;
     }
 
     private void Update()
@@ -156,7 +163,7 @@ public class PlayerShipMovement : MonoBehaviour
         if (moveXraw == 0 && moveYraw == 0)
         {
             ChangeEngineValues(false);
-            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration / factorDecreaseSpeed);
+            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * inertiaFactor / factorDecreaseSpeed); // acceleration insted of inertiaFactor
         }
         else
         {
@@ -182,11 +189,11 @@ public class PlayerShipMovement : MonoBehaviour
         lerp = 0;
     }
 
-    public void UpdateValues(float maxSpeed, float pullEnginesPower, float mobility)
+    public void UpdateValues()
     {
-        this.maxSpeed = maxSpeed;
-        PullEnginesPower = pullEnginesPower;
-        Mobility = mobility;
+        this.maxSpeed = shipConfiguration.MaxSpeed;
+        PullEnginesPower = shipConfiguration.EnginesAccelerationPower;
+        Mobility = shipConfiguration.Mobility;
     }
 
     private void OnDrawGizmos()

@@ -7,7 +7,7 @@ using UnityEngine;
 public class Gun : ItemShip
 {
     [Header("Main Stats")]
-    [SerializeField] private Bullet.Type barrelType;
+    [SerializeField] private Bullet.CaliberType barrelType;
     [SerializeField][Range(1, 5)] private int levelUpgrage = 1;
     [SerializeField] private float energyUsage = 0.0f;
     [SerializeField][Range(0, 1)] private float accuracy = 0.9f;
@@ -62,15 +62,18 @@ public class Gun : ItemShip
 
     static float randomSeed = 456;
 
-    private void FixedUpdate()
+    private void Awake()
     {
-        GunFire();
+        fireScript = transform.root.GetComponent<Fire>();
+        shipRB = transform.root.GetComponent<Rigidbody2D>();
+        if (fireScript == null || shipRB == null)
+            throw new NullReferenceException($"fireScript = {fireScript} and shipRB = {shipRB}");
     }
 
     void Start()
     {
         SetVolumeModifier();
-        
+
         FindEndBurrel();
 
         SetAudioClipsInAudioSourses();
@@ -82,6 +85,12 @@ public class Gun : ItemShip
         LoadResources();
 
         ChangeSpeedFireAnimation();
+    }
+
+
+    private void FixedUpdate()
+    {
+        GunFire();
     }
 
     private void SetVolumeModifier()
@@ -119,13 +128,7 @@ public class Gun : ItemShip
         LoadBulletInGun("Ship Assets/Bullets/CB 13.45"); // make dynamic
 
         if (chamber)
-        {
-            transformChamber = transform.Find("Chamber")?.GetComponent<Transform>();
-            if (transformChamber == null)
-                chamber = false;
-            else
-                LoadSleeveInGun("Ship Assets/Bullets/CB 13.45 sleeve"); // make dynamic
-        }
+            LoadChamberInGun();
     }
 
     private void SetAudioClipsInAudioSourses()
@@ -155,19 +158,20 @@ public class Gun : ItemShip
             throw new NullReferenceException($"bulletObject = null");
     }
 
+    private void LoadChamberInGun()
+    {
+        transformChamber = transform.Find("Chamber")?.GetComponent<Transform>();
+        if (transformChamber == null)
+            chamber = false;
+        else
+            LoadSleeveInGun("Ship Assets/Bullets/CB 13.45 sleeve"); // make dynamic
+    }
+    
     private void LoadSleeveInGun(string path)
     {
         sleeveObject = Resources.Load(path, typeof(GameObject)) as GameObject;
         if (sleeveObject == null)
             throw new NullReferenceException($"sleeveObject = null");
-    }
-
-    private void Awake()
-    {
-        fireScript = transform.root.GetComponent<Fire>();
-        shipRB = transform.root.GetComponent<Rigidbody2D>();
-        if (fireScript == null || shipRB == null)
-            throw new NullReferenceException($"fireScript = {fireScript} and shipRB = {shipRB}");
     }
 
     private void OnEnable()
@@ -257,6 +261,8 @@ public class Gun : ItemShip
         Vector2 force = vectorDirection * Random(0.2f, 0.4f) + shipRB.velocity;
 
         AddForceImpulse(sleeve_rb, force);
+        var impulse = (Random(-1000, 1000) * Mathf.Deg2Rad) * sleeve_rb.inertia;
+        sleeve_rb.AddTorque(impulse, ForceMode2D.Impulse);
     }
 
     private void AddForceImpulse(Rigidbody2D rigidbody2D, Vector2 force) => rigidbody2D.AddForce(force, ForceMode2D.Impulse);

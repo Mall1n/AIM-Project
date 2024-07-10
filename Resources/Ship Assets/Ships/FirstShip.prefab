@@ -202,7 +202,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ebc3c8646db74c479324610b73693cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mobility: 0.7
+  mobilityModified: 0.7
+  gliderMass: 250
   transformsEngine:
   - {fileID: 7930558053725344388}
   - {fileID: 4011764876035552738}
@@ -219,6 +220,7 @@ MonoBehaviour:
   - {fileID: 1871780452452031555}
   heavyGuns:
   - {fileID: 0}
+  shield: {fileID: 0}
   inventory:
   - {fileID: 0}
   - {fileID: 0}
@@ -245,6 +247,7 @@ MonoBehaviour:
   IDEngines: 
   IDEasyGuns: 
   IDHeavyGuns: 
+  IDShield: 0
 --- !u!4 &7930558053725344388 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8598017599014338405, guid: 9644b6f026474344592055fbb40c2892, type: 3}

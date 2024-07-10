@@ -10,7 +10,8 @@ public abstract class ItemShip : Item
         Unknown = 0,
         Engine = 1,
         EasyGun = 2,
-        HeavyGun = 3
+        HeavyGun = 3,
+        Shield = 4
     }
 
     // [SerializeField] private protected bool leftSide = false;

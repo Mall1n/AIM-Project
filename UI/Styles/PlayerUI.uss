@@ -13,7 +13,6 @@
     width: 500px;
     margin-left: 10px;
     padding-top: 7px;
-
 }
 
 .unity-progress-bar__background {
@@ -26,5 +25,19 @@
 }
 
 .unity-progress-bar__progress {
-    background-image: resource('Sprites/UI/Bar');
+    background-image: none;
+}
+
+.menu-background {
+    background-color: rgba(99, 99, 99, 0.8);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    opacity: 1;
+}
+
+.background-full-screen {
+    width: 100%;
+    height: 100%;
 }

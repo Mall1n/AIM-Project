@@ -4,6 +4,17 @@ using UnityEngine;
 
 public class Shield : ItemShip
 {
-    [SerializeField] private protected float shieldPoints;
-    public float ShieldPoints { get => shieldPoints; set => shieldPoints = value; }
+    [Header("Shield Settings")]
+    [SerializeField] private protected float maxEnergy;
+    public float MaxEnergy { get => maxEnergy; set => maxEnergy = value; }
+
+    [SerializeField] private float energyUsage;
+    public float EnergyUsage { get => energyUsage; set => energyUsage = value; }
+
+    public Shield()
+    {
+        maxEnergy = 0;
+        energyUsage = 0;
+    }
+
 }
