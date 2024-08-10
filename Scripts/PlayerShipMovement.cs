@@ -73,7 +73,7 @@ public class PlayerShipMovement : MonoBehaviour
         DefineFields();
     }
 
-    private void ChangeEngineValues(bool value)
+    private void ChangeEngineAnimationValues(bool value)
     {
         shipConfiguration.SetAnimatorsEngineFire(value);
     }
@@ -91,7 +91,7 @@ public class PlayerShipMovement : MonoBehaviour
     private void Update()
     {
         //Log
-        DefineFields();
+        //DefineFields();
         //Log
 
         GetMoveAxis();
@@ -160,19 +160,29 @@ public class PlayerShipMovement : MonoBehaviour
     private void Move()
     {
         lerp += Time.deltaTime;
+
         if (moveXraw == 0 && moveYraw == 0)
         {
-            ChangeEngineValues(false);
+            ChangeEngineAnimationValues(false);
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * inertiaFactor / factorDecreaseSpeed); // acceleration insted of inertiaFactor
         }
         else
         {
-            ChangeEngineValues(true);
+            ChangeEngineAnimationValues(true);
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration);
         }
 
+        if (pushBack != Vector2.zero)
+            moveDirection += pushBack * 25;
+        pushBack = Vector2.zero;
+
         rb.velocity = new Vector2(moveDirection.x * maxSpeed, moveDirection.y * maxSpeed);
+        //transform.
     }
+
+    private Vector2 pushBack = Vector2.zero;
+
+    public void AddVectorPushBack(Vector2 vector) => pushBack += vector;
 
     private bool CheckChangeDirection()
     {

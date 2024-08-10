@@ -22,6 +22,7 @@ public class ShipConfiguration : MonoBehaviour
     private float fullMass = 0;
     public float FullMass { get => fullMass; }
 
+    [Header("Components")]
     public Transform[] transformsEngine;
     public Engine[] engines; // make private
     public Transform[] transformsEasyGun;
@@ -124,7 +125,6 @@ public class ShipConfiguration : MonoBehaviour
             return resultValue;
         }
     }
-
 
     public void SetAnimatorsEngineFire(bool value)
     {

@@ -38,6 +38,7 @@ public class Gun : ItemShip
 
     [Header("Additional Settings")]
     [SerializeField] private bool chamber = false;
+    [SerializeField][Range(0, 10)] private float forceShotPushBack = 0.0f;
 
 
     //[SerializeField] 
@@ -85,6 +86,8 @@ public class Gun : ItemShip
         LoadResources();
 
         ChangeSpeedFireAnimation();
+
+        playerShipMovement = transform.root.GetComponent<PlayerShipMovement>();
     }
 
 
@@ -166,7 +169,7 @@ public class Gun : ItemShip
         else
             LoadSleeveInGun("Ship Assets/Bullets/CB 13.45 sleeve"); // make dynamic
     }
-    
+
     private void LoadSleeveInGun(string path)
     {
         sleeveObject = Resources.Load(path, typeof(GameObject)) as GameObject;
@@ -228,15 +231,21 @@ public class Gun : ItemShip
 
         Vector3 bulletVectorEuler = bulletObject.transform.eulerAngles;
         bulletObject.transform.eulerAngles = new Vector3(bulletVectorEuler.x, bulletVectorEuler.y, bulletVectorEuler.z + angelSpread);
-        Vector2 force = bulletObject.transform.up * (float)bullet?.Speed + (Vector3)shipRB.velocity;
+        Vector2 bulletForce = bulletObject.transform.up * (float)bullet?.Speed + (Vector3)shipRB.velocity;
+        //Vector2 force = bulletObject.transform.up * (float)bullet?.Speed + (Vector3)shipRB.velocity;
 
-        AddForceImpulse(bullet_rb, force);
+        AddForceImpulse(bullet_rb, bulletForce + shipRB.velocity);
+
+        if (forceShotPushBack > 0)
+            ForceShotPushBack(bulletForce);
 
         FireAnimator?.SetTrigger(triggerNameFire);
 
         if (++ausioSourseIndex >= AudioFires.Length)
             ausioSourseIndex = 0;
         AudioFires[ausioSourseIndex]?.Play();
+
+
     }
 
     private void InitSleeve()
@@ -264,6 +273,15 @@ public class Gun : ItemShip
         var impulse = (Random(-1000, 1000) * Mathf.Deg2Rad) * sleeve_rb.inertia;
         sleeve_rb.AddTorque(impulse, ForceMode2D.Impulse);
     }
+
+    private void ForceShotPushBack(Vector2 vector)
+    {
+        Vector2 vactorValue = -vector * forceShotPushBack / 100;
+        playerShipMovement.AddVectorPushBack(vactorValue);
+    }
+
+    //Action onShot;
+    PlayerShipMovement playerShipMovement;
 
     private void AddForceImpulse(Rigidbody2D rigidbody2D, Vector2 force) => rigidbody2D.AddForce(force, ForceMode2D.Impulse);
 

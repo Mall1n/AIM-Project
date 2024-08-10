@@ -7,9 +7,17 @@
             <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Log" style="color: rgb(255, 255, 255); margin-left: 12px;" />
         </ui:VisualElement>
     </ui:VisualElement>
-    <ui:VisualElement name="BlackgroundShading" class="background background-full-screen" style="position: absolute; background-color: rgba(0, 0, 0, 0.5); visibility: hidden;">
-        <ui:VisualElement class="menu-background" style="position: absolute; left: 20%; top: 10%; right: 20%; bottom: 10%; background-color: rgba(53, 53, 53, 0.8);">
-            <ui:GroupBox />
+    <ui:VisualElement name="BlackgroundShading" class="background background-full-screen" style="position: absolute; background-color: rgba(0, 0, 0, 0.5); visibility: visible; display: none;">
+        <ui:VisualElement name="Inventory" class="menu-background menu-background-inventory" style="position: absolute; left: 50%; top: 10%; right: 20%; bottom: 10%; background-color: rgba(53, 53, 53, 0.8);">
+            <ui:VisualElement name="Inventory-block" class="inventory-block" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" style="flex-wrap: wrap;" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" style="flex-wrap: wrap;" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" style="flex-wrap: wrap;" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" style="flex-wrap: wrap;" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" style="flex-wrap: wrap;" />
+            <ui:VisualElement name="Inventory-block" class="inventory-block" style="flex-wrap: wrap;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [ExecuteAlways]
-public class Grid : MonoBehaviour
+public class MyGrid : MonoBehaviour
 {
     private void OnDrawGizmos()
     {
