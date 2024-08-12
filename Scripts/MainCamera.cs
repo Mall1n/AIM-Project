@@ -22,6 +22,7 @@ public class MainCamera : MonoBehaviour
     void Start()
     {
         _camera = GetComponent<Camera>();
+        _camera.orthographicSize = 2;
         if (backgroud != null)
         {
             backgroudOffset = backgroud.transform.position;

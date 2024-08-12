@@ -23,7 +23,7 @@ public class PlayerShipMovement : MonoBehaviour
 
 
     [SerializeField][Range(0, 10)] private float maxSpeed = 0;
-    [SerializeField]float inertiaFactor = 0.1f;
+    [SerializeField] float inertiaFactor = 0.1f;
 
 
 
@@ -159,19 +159,48 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void Move()
     {
+        //float Acceleration = 0;
         lerp += Time.deltaTime;
-        if (moveXraw == 0 && moveYraw == 0)
+        if (moveDirection_Raw == Vector2.zero)
+        //if (moveXraw == 0 && moveYraw == 0)
         {
             ChangeEngineValues(false);
+            //moveDirection -= moveDirection * (lerp * inertiaFactor / factorDecreaseSpeed);
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * inertiaFactor / factorDecreaseSpeed); // acceleration insted of inertiaFactor
         }
         else
         {
             ChangeEngineValues(true);
+
+            //Acceleration += Time.fixedDeltaTime * acceleration / 100;
+
+            // moveDirection += acceleration * Time.fixedDeltaTime * Vector2.one;
+
+            // rb.velocity += moveDirection;
+
+            // if (rb.velocity.magnitude > maxSpeed)
+            //     rb.velocity = rb.velocity.normalized * maxSpeed;
+
+            // if (moveDirection.magnitude > maxSpeed)
+            // {
+            //     //float otnos = moveDirection.normalized.x / moveDirection.y;
+            //     moveDirection = moveDirection.normalized * maxSpeed;
+                
+            // }
+
+
+            //moveDirection += moveDirection_Raw * (lerp * acceleration / 100);
             moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration);
         }
 
-        rb.velocity = new Vector2(moveDirection.x * maxSpeed, moveDirection.y * maxSpeed);
+
+
+      
+        //if (rb.velocity.magnitude > maxSpeed)
+
+        rb.velocity = moveDirection.normalized * maxSpeed;
+        //rb.velocity = new Vector2(moveDirection.normalized.x * maxSpeed, moveDirection.normalized.y * maxSpeed);
+
     }
 
     private bool CheckChangeDirection()
