@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -20,8 +18,8 @@ public class UI_Player : MonoBehaviour
     private const string label_Log_Name = "Log";
     private void LogLabelStats()
     {
-        labelLog.text = $"Ship Configuration:\nMass = {shipConfiguration.FullMass}\nMobility = {shipConfiguration.Mobility}\nEngine Acceleration = {shipConfiguration.EnginesAccelerationPower}\nMax Speed = {shipConfiguration.MaxSpeed}\n\n" +
-        $"Player Ship Movement:\nSpeed = {playerShipMovement.Rb.velocity.magnitude}\nAcceleration = {playerShipMovement.Acceleration}";
+        labelLog.text = $"Ship Configuration:\nMass = {shipConfiguration.FullMass}\nMobility = {shipConfiguration.Mobility}\nEngines Pull Power= {shipConfiguration.EnginesPullPower}\nMax Speed = {shipConfiguration.MaxSpeed}\n\n" +
+        $"Player Ship Movement:\nSpeed = {playerShipMovement.Rb.velocity.magnitude}\n";
     }
     // LOG..............................................................
 
@@ -32,7 +30,7 @@ public class UI_Player : MonoBehaviour
         if (playerShipMovement == null)
             throw new System.NullReferenceException("playerShipMovement was null in UI player");
 
-        ShipConfiguration.onChangedShiledHP += UpdateProgressBarValue_Shield;
+        ShipConfiguration._onChangedShiledHP += UpdateProgressBarValue_Shield;
         var uiDocument = GetComponent<UIDocument>();
 
         progressBar_Shield = uiDocument.rootVisualElement.Q<ProgressBar>(progressBar_Shield_Name);
@@ -60,7 +58,7 @@ public class UI_Player : MonoBehaviour
 
     private void OnDisable()
     {
-        ShipConfiguration.onChangedShiledHP -= UpdateProgressBarValue_Shield;
+        ShipConfiguration._onChangedShiledHP -= UpdateProgressBarValue_Shield;
     }
 
     private void UpdateProgressBarValue_Shield(float value)

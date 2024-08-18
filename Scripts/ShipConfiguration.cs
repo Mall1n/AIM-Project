@@ -2,25 +2,27 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 public class ShipConfiguration : MonoBehaviour
 {
     [Header("Main Attributes")]
     //[SerializeField] private PlayerShipMovement playerShipMovement;
     //[SerializeField] private float mass = 0;
-    [SerializeField][Range(0, 1)] private float mobilityModified = 0.5f; // readonly
-    [SerializeField] private float gliderMass = 100f;
-    [Range(0, 1)] private float mobility;
-    public float Mobility { get => mobility; }
-    private float powerEngines;
-    private float maxSpeed;
-    public float MaxSpeed { get => maxSpeed; }
-    private float enginesAccelerationPower;
-    public float EnginesAccelerationPower { get => enginesAccelerationPower; }
-    private float fullMass = 0;
-    public float FullMass { get => fullMass; }
+    [SerializeField][Range(0, 1)] private float mobilityModifier = 0.5f; // readonly
+    [SerializeField] private float _gliderMass = 100;
+    [SerializeField][Range(0, 5)] private float _maxSpeedBase = 2;
+    [SerializeField] private float _inventoryCapacity = 500;
+    private float _ratioCapacity => GetFullShipMass() / _inventoryCapacity;
+    private float _maxSpeed;
+    public float MaxSpeed { get => _maxSpeed; }
+    [Range(0, 1)] private float _mobility;
+    public float Mobility { get => _mobility; }
+    private float _powerEngines;
+    private float _enginesPullPower;
+    public float EnginesPullPower { get => _enginesPullPower; }
+    private float _fullMass;
+    public float FullMass { get => _fullMass; }
+    private float _equipmentMass;
 
     public Transform[] transformsEngine;
     public Engine[] engines; // make private
@@ -31,20 +33,23 @@ public class ShipConfiguration : MonoBehaviour
     public Shield shield; // make private
     [SerializeField] private Item[] inventory;
 
-    public static Action onChangedShipValues;
-    public static Action<float> onChangedShiledHP;
+    public static Action<float, float, float> _onChangedShipValues;
+    public static Action<float> _onChangedShiledHP; // delete
 
 
     private void Awake()
     {
         if (shield == null)
             shield = new Shield();
+
         FullSetShipValues();
+        if (_ratioCapacity > 1)
+            Debug.LogWarning($"Ratio Capacity grather then 100% | {this.transform.name}");
     }
 
     private void Start()
     {
-        onChangedShipValues?.Invoke();
+        _onChangedShipValues?.Invoke(_maxSpeed, _enginesPullPower, _mobility);
     }
 
     public void SetInventoryCapacity(int capacity)
@@ -82,32 +87,33 @@ public class ShipConfiguration : MonoBehaviour
 
     public void FullSetShipValues()
     {
-        fullMass = GetFullShipMass();
+        _equipmentMass = GetEquipmentMass();
 
-        powerEngines = GetPowerEngines();
+        _fullMass = GetFullShipMassFast();
 
-        maxSpeed = GetMaxSpeed();
+        _powerEngines = GetPowerEngines();
 
-        enginesAccelerationPower = GetEnginesAccelerationPower();
+        _maxSpeed = GetMaxSpeed();
 
-        mobility = GetMobility();
+        _enginesPullPower = GetEnginesAccelerationPower();
+
+        _mobility = GetMobility();
     }
 
-    private float GetMobility() => mobilityModified - (mobilityModified * fullMass / 2500); 
+    private float GetMobility() => mobilityModifier - (mobilityModifier * 0.75f * _ratioCapacity);
 
-    private float GetMaxSpeed() => powerEngines / 20;
+    private float GetMaxSpeed() => _maxSpeedBase - (_maxSpeedBase * 0.75f * _ratioCapacity);
 
     private float GetEnginesAccelerationPower()
     {
-        const float modifierValue = 20;
-        float powerEnginesModiried = powerEngines / modifierValue;
-        return powerEnginesModiried - (powerEnginesModiried * fullMass / 1000);
+        //const float modifierValue = 20;
+        //float powerEnginesModiried = _powerEngines / modifierValue;
+        return _powerEngines - (_powerEngines * _fullMass / 1000);
     }
 
-    private float GetFullShipMass()
+    private float GetEquipmentMass()
     {
         float mass = 0;
-        mass += gliderMass;
         mass += ForeachReturnValue(engines);
         mass += ForeachReturnValue(easyGuns);
         mass += ForeachReturnValue(heavyGuns);
@@ -125,6 +131,24 @@ public class ShipConfiguration : MonoBehaviour
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    private float GetFullShipMass()
+    {
+        float mass = 0;
+        mass += _gliderMass;
+        mass += GetEquipmentMass();
+        return mass;
+    }
+
+    private float GetFullShipMassFast()
+    {
+        float mass = 0;
+        mass += _gliderMass;
+        mass += _equipmentMass;
+        return mass;
+    }
+>>>>>>> Stashed changes
 
     public void SetAnimatorsEngineFire(bool value)
     {

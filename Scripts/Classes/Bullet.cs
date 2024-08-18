@@ -10,12 +10,13 @@ public class Bullet : ItemInvertory
     [SerializeField] private float damage;
     [SerializeField] private CaliberType bulletСaliber;
     public CaliberType BulletСaliber { get => bulletСaliber; }
+    private const float destroyObjectTime = 10.0f;
 
     public enum CaliberType
     {
         caliber_13_45 = 1
     }
-    private const float destroyObjectTime = 10.0f;
+
 
 
     private void Start()
@@ -27,17 +28,25 @@ public class Bullet : ItemInvertory
     {
         yield return new WaitForSeconds(destroyObjectTime);
         if (this.gameObject != null)
-            Destroy(this.gameObject);
+            DestroyThis();
+        //Destroy(this.gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (this.gameObject != null)
-            Destroy(this.gameObject);
+            DestroyThis();
+        //Destroy(this.gameObject);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         StopAllCoroutines();
+    }
+
+    private void DestroyThis()
+    {
+        StopCoroutine(DestroyObjectInTime());
+        Destroy(this.gameObject);
     }
 }

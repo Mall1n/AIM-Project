@@ -202,8 +202,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ebc3c8646db74c479324610b73693cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mobilityModified: 0.7
-  gliderMass: 250
+  mobilityModifier: 0.75
+  _gliderMass: 100
+  _maxSpeedBase: 2
+  _inventoryCapacity: 1000
   transformsEngine:
   - {fileID: 7930558053725344388}
   - {fileID: 4011764876035552738}

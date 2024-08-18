@@ -1,19 +1,15 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(AudioSource))]
+//[RequireComponent(typeof(AudioSource))]
 // [ExecuteAlways]
 public class PlayerShipMovement : MonoBehaviour
 {
     [Header("Main Attributes")]
-    [SerializeField] private ShipConfiguration shipConfiguration;
+    [SerializeField] private ShipConfiguration _shipConfiguration;
     [SerializeField] private Camera _camera;
-
-
-    // [Header("Engine Sound")]
-    // [SerializeField] private AudioClip audioEngineSound;
-    // private AudioSource audioEngineSource;
 
 
     [Header("Log Attributes")]
@@ -22,70 +18,60 @@ public class PlayerShipMovement : MonoBehaviour
     //Log
 
 
+<<<<<<< Updated upstream
     [SerializeField][Range(0, 10)] private float maxSpeed = 0;
     [SerializeField] float inertiaFactor = 0.1f;
+=======
+    [SerializeField][Range(0, 2)] float _inertiaFactor = 0.1f;
+>>>>>>> Stashed changes
 
-
-
-    [Range(0, 20)] private float pullEnginesPower = 0;
-    public float PullEnginesPower
+    private float _maxSpeed = 0;
+    private float _enginesPullPower = 0;
+    //public float PullEnginesPower { get => _enginesPullPower; set { _enginesPullPower = value; } }
+    private float _mobility = 0;
+    public void SetMobility(float value)
     {
-        get => pullEnginesPower;
-        set { pullEnginesPower = value; DefineAcceleration(); }
+        _mobility = value;
+        DefineRotateMobility();
     }
-    [SerializeField]
-    private float acceleration = 0;
-    public float Acceleration { get => acceleration; }
+    //public float Mobility { get => _mobility; set { _mobility = value; DefineRotateMobility(); } }
+    //[SerializeField]
+    private float _rotateMobility = 0;
 
 
-    [Range(0.01f, 1f)] private float mobility = 0;
-    public float Mobility { get => mobility; set { mobility = value; DefineMobility(); } }
-
-
-    [SerializeField]
-    private float rotateMobility = 0;
-
-
-    private Rigidbody2D rb;
-    public Rigidbody2D Rb { get => rb; }
-
+    private Rigidbody2D _rb;
+    public Rigidbody2D Rb { get => _rb; }
     private Vector2 mousePosition;
     private Vector2 moveDirection_Raw;
-    private Vector2 moveDirection;
-    private Vector2 moveDirection_From;
-    private float moveX_From = 0;
-    private float moveY_From = 0;
     private float moveXraw = 0;
     private float moveYraw = 0;
-    private float lerp = 0;
-    private readonly float factorDecreaseSpeed = 2;
-
+    //private float lerp = 0;
 
 
     private void Awake()
     {
-        if (shipConfiguration == null)
+        if (_shipConfiguration == null)
             throw new NullReferenceException("shipConfiguration equals null");
 
-        rb = GetComponent<Rigidbody2D>();
-        //audioEngineSource = GetComponent<AudioSource>();
-
-        DefineFields();
+        _rb = GetComponent<Rigidbody2D>();
+        StartCoroutine(WaitFor());
     }
 
     private void ChangeEngineValues(bool value)
     {
-        shipConfiguration.SetAnimatorsEngineFire(value);
+        _shipConfiguration.SetAnimatorsEngineFire(value); // rework to Action
     }
 
     private void OnEnable()
     {
-        ShipConfiguration.onChangedShipValues += UpdateValues;
+        ShipConfiguration._onChangedShipValues += UpdateValues;
     }
 
     private void OnDisable()
     {
-        ShipConfiguration.onChangedShipValues -= UpdateValues;
+        ShipConfiguration._onChangedShipValues -= UpdateValues;
+
+        StopAllCoroutines();
     }
 
     private void Update()
@@ -99,38 +85,28 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (CheckChangeDirection())
-            ResetValuesDirection();
-
         Move();
 
         BodyRotate();
     }
 
-    private void DefineFields()
+    private void UpdateValues(float maxSpeed, float enginesPullPower, float mobility)
     {
-        DefineAcceleration();
-
-        DefineMobility();
+        _maxSpeed = maxSpeed;
+        _enginesPullPower = enginesPullPower;
+        //_mobility = mobility;
+        SetMobility(mobility);
     }
 
-    private void DefineAcceleration()
+    private void DefineRotateMobility()
     {
-        if (pullEnginesPower == 0 || maxSpeed == 0)
-            acceleration = 0;
-        else
-            acceleration = pullEnginesPower / maxSpeed;
-    }
-
-    private void DefineMobility()
-    {
-        if (Mobility < 1)
+        if (_mobility < 1)
         {
-            float reverseMobility = 1 - Mobility;
-            rotateMobility = (360 - (reverseMobility * 360)) / (90 * reverseMobility) + 1;
-            if (rotateMobility > 180) rotateMobility = 180;
+            float reverseMobility = 1 - _mobility;
+            _rotateMobility = (360 - (reverseMobility * 360)) / (90 * reverseMobility) + 1;
+            if (_rotateMobility > 180) _rotateMobility = 180;
         }
-        else { rotateMobility = 180; }
+        else { _rotateMobility = 180; }
     }
 
     private void GetMoveAxis()
@@ -154,11 +130,12 @@ public class PlayerShipMovement : MonoBehaviour
 
         Quaternion q = Quaternion.LookRotation(Vector3.forward, mousePosition);
 
-        rb.rotation = Quaternion.RotateTowards(transform.rotation, q, rotateMobility).eulerAngles.z;
+        _rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility).eulerAngles.z;
     }
 
     private void Move()
     {
+<<<<<<< Updated upstream
         //float Acceleration = 0;
         lerp += Time.deltaTime;
         if (moveDirection_Raw == Vector2.zero)
@@ -204,25 +181,82 @@ public class PlayerShipMovement : MonoBehaviour
     }
 
     private bool CheckChangeDirection()
-    {
-        if (moveXraw != moveX_From || moveYraw != moveY_From)
-            return true;
-        return false;
+=======
+        if (moveDirection_Raw == Vector2.zero)
+        {
+            ChangeEngineAnimationValues(false);
+            if (_rb.velocity.magnitude > 0)
+            {
+                // Vector2 vectorInertia = _rb.velocity.normalized * _inertiaFactor * Time.fixedDeltaTime;
+
+                // if (_rb.velocity.magnitude - vectorInertia.magnitude < 0)
+                //     _rb.velocity = Vector2.zero;
+                // else
+                //     _rb.velocity -= vectorInertia;
+                if (_rb.velocity.magnitude <= 0.001f)
+                    _rb.velocity = Vector2.zero;
+                else
+                    _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * 100 * Time.deltaTime, ForceMode2D.Force);
+            }
+        }
+        else
+        {
+            ChangeEngineAnimationValues(true);
+
+            //if (_rb.velocity.magnitude <= _maxSpeed)
+            {
+                //if (_rb.velocity.magnitude <= _maxSpeed)
+                    _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+
+                //if (_rb.velocity.magnitude > _maxSpeed)
+                //    _rb.AddForce(-moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+
+                // if (_rb.velocity.magnitude == 0)
+                //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+                // else
+                // {
+                //     //float f = Mathf.Pow(_maxSpeed / _rb.velocity.magnitude, -1);
+                //     float f = 1 - _rb.velocity.magnitude / _maxSpeed;
+                //     Debug.Log(f);
+                //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime * f, ForceMode2D.Force);
+                // }
+
+            }
+            // else if (_rb.velocity.magnitude == _maxSpeed)
+            // {
+
+            // }
+        }
+
+        if (pushBack != Vector2.zero)
+        {
+            pushBack *= 500;
+            _rb.AddForce(pushBack, ForceMode2D.Force);
+            pushBack = Vector2.zero;
+        }
     }
 
-    private void ResetValuesDirection()
-    {
-        moveX_From = moveXraw;
-        moveY_From = moveYraw;
-        moveDirection_From = moveDirection;
-        lerp = 0;
-    }
+    private Vector2 pushBack = Vector2.zero;
+    public void AddVectorPushBack(Vector2 vector) => pushBack += vector;
 
-    public void UpdateValues()
+    private IEnumerator WaitFor()
+>>>>>>> Stashed changes
     {
-        this.maxSpeed = shipConfiguration.MaxSpeed;
-        PullEnginesPower = shipConfiguration.EnginesAccelerationPower;
-        Mobility = shipConfiguration.Mobility;
+        while (true)
+        {
+            yield return new WaitForFixedUpdate();
+            if (_rb.velocity.magnitude > _maxSpeed && moveDirection_Raw != Vector2.zero)
+            {
+                // Vector2 vectorInertia = _rb.velocity.normalized * _inertiaFactor * Time.deltaTime;
+                // _rb.velocity -= vectorInertia;
+
+                // if (_rb.velocity.magnitude < _maxSpeed)
+                //     _rb.velocity = _rb.velocity.normalized * _maxSpeed;
+
+                //_rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * Time.deltaTime, ForceMode2D.Force);
+                _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * 100 * Time.deltaTime, ForceMode2D.Force);
+            }
+        }
     }
 
     private void OnDrawGizmos()
@@ -230,17 +264,14 @@ public class PlayerShipMovement : MonoBehaviour
         if (!LogDrawLinesDirection)
             return;
 
+        _rb = GetComponent<Rigidbody2D>();
+
         Vector2 position = new Vector2(transform.position.x, transform.position.y);
         DrawLine(moveDirection_Raw);
 
-        Gizmos.color = Color.blue;
-        DrawLine(moveDirection_From);
-
         Gizmos.color = Color.red;
-        DrawLine(moveDirection);
+        DrawLine(_rb.velocity);
 
-        // Gizmos.color = Color.yellow;
-        // DrawLine(DrowLineTest);
 
         //Debug.Log($"from {transform.position} to {moveDirection}");
         void DrawLine(Vector2 vector) => Gizmos.DrawLine(transform.position, position + vector);
