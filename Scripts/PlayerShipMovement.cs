@@ -18,12 +18,7 @@ public class PlayerShipMovement : MonoBehaviour
     //Log
 
 
-<<<<<<< Updated upstream
-    [SerializeField][Range(0, 10)] private float maxSpeed = 0;
-    [SerializeField] float inertiaFactor = 0.1f;
-=======
     [SerializeField][Range(0, 2)] float _inertiaFactor = 0.1f;
->>>>>>> Stashed changes
 
     private float _maxSpeed = 0;
     private float _enginesPullPower = 0;
@@ -57,7 +52,7 @@ public class PlayerShipMovement : MonoBehaviour
         StartCoroutine(WaitFor());
     }
 
-    private void ChangeEngineValues(bool value)
+    private void ChangeEngineAnimationValues(bool value)
     {
         _shipConfiguration.SetAnimatorsEngineFire(value); // rework to Action
     }
@@ -77,7 +72,7 @@ public class PlayerShipMovement : MonoBehaviour
     private void Update()
     {
         //Log
-        DefineFields();
+        //DefineFields();
         //Log
 
         GetMoveAxis();
@@ -135,53 +130,6 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void Move()
     {
-<<<<<<< Updated upstream
-        //float Acceleration = 0;
-        lerp += Time.deltaTime;
-        if (moveDirection_Raw == Vector2.zero)
-        //if (moveXraw == 0 && moveYraw == 0)
-        {
-            ChangeEngineValues(false);
-            //moveDirection -= moveDirection * (lerp * inertiaFactor / factorDecreaseSpeed);
-            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * inertiaFactor / factorDecreaseSpeed); // acceleration insted of inertiaFactor
-        }
-        else
-        {
-            ChangeEngineValues(true);
-
-            //Acceleration += Time.fixedDeltaTime * acceleration / 100;
-
-            // moveDirection += acceleration * Time.fixedDeltaTime * Vector2.one;
-
-            // rb.velocity += moveDirection;
-
-            // if (rb.velocity.magnitude > maxSpeed)
-            //     rb.velocity = rb.velocity.normalized * maxSpeed;
-
-            // if (moveDirection.magnitude > maxSpeed)
-            // {
-            //     //float otnos = moveDirection.normalized.x / moveDirection.y;
-            //     moveDirection = moveDirection.normalized * maxSpeed;
-                
-            // }
-
-
-            //moveDirection += moveDirection_Raw * (lerp * acceleration / 100);
-            moveDirection = Vector2.MoveTowards(moveDirection_From, moveDirection_Raw, lerp * acceleration);
-        }
-
-
-
-      
-        //if (rb.velocity.magnitude > maxSpeed)
-
-        rb.velocity = moveDirection.normalized * maxSpeed;
-        //rb.velocity = new Vector2(moveDirection.normalized.x * maxSpeed, moveDirection.normalized.y * maxSpeed);
-
-    }
-
-    private bool CheckChangeDirection()
-=======
         if (moveDirection_Raw == Vector2.zero)
         {
             ChangeEngineAnimationValues(false);
@@ -208,8 +156,8 @@ public class PlayerShipMovement : MonoBehaviour
                 //if (_rb.velocity.magnitude <= _maxSpeed)
                     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
 
-                //if (_rb.velocity.magnitude > _maxSpeed)
-                //    _rb.AddForce(-moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+                if (_rb.velocity.magnitude > _maxSpeed)
+                    _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
 
                 // if (_rb.velocity.magnitude == 0)
                 //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
@@ -240,7 +188,6 @@ public class PlayerShipMovement : MonoBehaviour
     public void AddVectorPushBack(Vector2 vector) => pushBack += vector;
 
     private IEnumerator WaitFor()
->>>>>>> Stashed changes
     {
         while (true)
         {

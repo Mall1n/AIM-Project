@@ -190,8 +190,8 @@ MonoBehaviour:
   mass: 30
   itemType: 1
   itemSide: 0
-  power: 50
-  energyUsage: 40
+  power: 75
+  energyUsage: 100
   animatorEngineFire: {fileID: 4392772781951121954}
 --- !u!4 &9027550665356055707 stripped
 Transform:

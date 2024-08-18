@@ -24,6 +24,7 @@ public class ShipConfiguration : MonoBehaviour
     public float FullMass { get => _fullMass; }
     private float _equipmentMass;
 
+    [Header("Components")]
     public Transform[] transformsEngine;
     public Engine[] engines; // make private
     public Transform[] transformsEasyGun;
@@ -131,8 +132,6 @@ public class ShipConfiguration : MonoBehaviour
         }
     }
 
-<<<<<<< Updated upstream
-=======
     private float GetFullShipMass()
     {
         float mass = 0;
@@ -148,7 +147,6 @@ public class ShipConfiguration : MonoBehaviour
         mass += _equipmentMass;
         return mass;
     }
->>>>>>> Stashed changes
 
     public void SetAnimatorsEngineFire(bool value)
     {

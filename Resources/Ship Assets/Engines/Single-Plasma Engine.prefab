@@ -191,7 +191,7 @@ MonoBehaviour:
   itemType: 1
   itemSide: 0
   power: 60
-  energyUsage: 20
+  energyUsage: 60
   animatorEngineFire: {fileID: 4818362787984426679}
 --- !u!4 &4869621999603878454 stripped
 Transform:
