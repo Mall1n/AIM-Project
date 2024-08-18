@@ -153,11 +153,11 @@ public class PlayerShipMovement : MonoBehaviour
 
             //if (_rb.velocity.magnitude <= _maxSpeed)
             {
-                //if (_rb.velocity.magnitude <= _maxSpeed)
+                if (_rb.velocity.magnitude <= _maxSpeed)
                     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
 
-                if (_rb.velocity.magnitude > _maxSpeed)
-                    _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+                // if (_rb.velocity.magnitude > _maxSpeed)
+                //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
 
                 // if (_rb.velocity.magnitude == 0)
                 //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
@@ -178,7 +178,7 @@ public class PlayerShipMovement : MonoBehaviour
 
         if (pushBack != Vector2.zero)
         {
-            pushBack *= 500;
+            pushBack *= 5;
             _rb.AddForce(pushBack, ForceMode2D.Force);
             pushBack = Vector2.zero;
         }
