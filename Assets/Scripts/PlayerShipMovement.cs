@@ -49,7 +49,7 @@ public class PlayerShipMovement : MonoBehaviour
             throw new NullReferenceException("shipConfiguration equals null");
 
         _rb = GetComponent<Rigidbody2D>();
-        StartCoroutine(WaitFor());
+        //StartCoroutine(WaitFor());
     }
 
     private void ChangeEngineAnimationValues(bool value)
@@ -130,62 +130,66 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void Move()
     {
-        if (moveDirection_Raw == Vector2.zero)
+        // if (moveDirection_Raw == Vector2.zero)
+        // {
+        //     ChangeEngineAnimationValues(false);
+        //     if (_rb.velocity.magnitude > 0)
+        //     {
+        //         if (_rb.velocity.magnitude <= 0.001f)
+        //             _rb.velocity = Vector2.zero;
+        //         else
+        //             _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * 100 * Time.deltaTime, ForceMode2D.Force);
+        //     }
+        // }
+        // else
+        // {
+        //     ChangeEngineAnimationValues(true);
+        //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+        // }
+
+        if (moveDirection_Raw != Vector2.zero)
         {
-            ChangeEngineAnimationValues(false);
+            ChangeEngineAnimationValues(true); // change to Action
+            _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+        }
+        else // Inertia if no Input
+        {
+            ChangeEngineAnimationValues(false); // change to Action
             if (_rb.velocity.magnitude > 0)
             {
-                // Vector2 vectorInertia = _rb.velocity.normalized * _inertiaFactor * Time.fixedDeltaTime;
-
-                // if (_rb.velocity.magnitude - vectorInertia.magnitude < 0)
-                //     _rb.velocity = Vector2.zero;
-                // else
-                //     _rb.velocity -= vectorInertia;
                 if (_rb.velocity.magnitude <= 0.001f)
                     _rb.velocity = Vector2.zero;
                 else
                     _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * 100 * Time.deltaTime, ForceMode2D.Force);
             }
         }
-        else
-        {
-            ChangeEngineAnimationValues(true);
-
-            //if (_rb.velocity.magnitude <= _maxSpeed)
-            {
-                if (_rb.velocity.magnitude <= _maxSpeed)
-                    _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
-
-                // if (_rb.velocity.magnitude > _maxSpeed)
-                //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
-
-                // if (_rb.velocity.magnitude == 0)
-                //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
-                // else
-                // {
-                //     //float f = Mathf.Pow(_maxSpeed / _rb.velocity.magnitude, -1);
-                //     float f = 1 - _rb.velocity.magnitude / _maxSpeed;
-                //     Debug.Log(f);
-                //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime * f, ForceMode2D.Force);
-                // }
-
-            }
-            // else if (_rb.velocity.magnitude == _maxSpeed)
-            // {
-
-            // }
-        }
 
         if (pushBack != Vector2.zero)
         {
-            pushBack *= 5;
-            _rb.AddForce(pushBack, ForceMode2D.Force);
+            pushBack /= 100;
+            _rb.AddForce(pushBack, ForceMode2D.Impulse);
             pushBack = Vector2.zero;
+        }
+    }
+
+    private void LateUpdate()
+    {
+        if (_rb.velocity.magnitude > 0) // Decrease to maxSpeed
+        {
+            if (moveDirection_Raw != Vector2.zero)
+            {
+                if (_rb.velocity.magnitude <= _maxSpeed)
+                    _rb.AddForce(-_rb.velocity.normalized * _enginesPullPower * Mathf.Pow(_rb.velocity.magnitude / _maxSpeed, 1) * Time.fixedDeltaTime, ForceMode2D.Force); // temp Mathf.Pow
+                else
+                    _rb.AddForce(-_rb.velocity.normalized * _enginesPullPower * _maxSpeed * Time.fixedDeltaTime, ForceMode2D.Force);
+            }
         }
     }
 
     private Vector2 pushBack = Vector2.zero;
     public void AddVectorPushBack(Vector2 vector) => pushBack += vector;
+
+
 
     private IEnumerator WaitFor()
     {
