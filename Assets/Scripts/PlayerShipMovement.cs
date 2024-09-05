@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
-//[RequireComponent(typeof(AudioSource))]
 // [ExecuteAlways]
 public class PlayerShipMovement : MonoBehaviour
 {
@@ -22,25 +21,23 @@ public class PlayerShipMovement : MonoBehaviour
 
     private float _maxSpeed = 0;
     private float _enginesPullPower = 0;
-    //public float PullEnginesPower { get => _enginesPullPower; set { _enginesPullPower = value; } }
     private float _mobility = 0;
     public void SetMobility(float value)
     {
         _mobility = value;
         DefineRotateMobility();
     }
-    //public float Mobility { get => _mobility; set { _mobility = value; DefineRotateMobility(); } }
     //[SerializeField]
     private float _rotateMobility = 0;
 
 
     private Rigidbody2D _rb;
     public Rigidbody2D Rb { get => _rb; }
-    private Vector2 mousePosition;
-    private Vector2 moveDirection_Raw;
-    private float moveXraw = 0;
-    private float moveYraw = 0;
-    //private float lerp = 0;
+    private Vector2 _mousePosition;
+    private Vector2 _moveDirection_Raw;
+    private float _moveXraw = 0;
+    private float _moveYraw = 0;
+    private float _ratioSpeed => _rb.velocity.magnitude / _maxSpeed;
 
 
     private void Awake()
@@ -49,7 +46,11 @@ public class PlayerShipMovement : MonoBehaviour
             throw new NullReferenceException("shipConfiguration equals null");
 
         _rb = GetComponent<Rigidbody2D>();
+<<<<<<< Updated upstream
         //StartCoroutine(WaitFor());
+=======
+        _inertiaFactor *= 100;
+>>>>>>> Stashed changes
     }
 
     private void ChangeEngineAnimationValues(bool value)
@@ -65,8 +66,6 @@ public class PlayerShipMovement : MonoBehaviour
     private void OnDisable()
     {
         ShipConfiguration._onChangedShipValues -= UpdateValues;
-
-        StopAllCoroutines();
     }
 
     private void Update()
@@ -89,7 +88,6 @@ public class PlayerShipMovement : MonoBehaviour
     {
         _maxSpeed = maxSpeed;
         _enginesPullPower = enginesPullPower;
-        //_mobility = mobility;
         SetMobility(mobility);
     }
 
@@ -106,30 +104,28 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void GetMoveAxis()
     {
-        moveXraw = Input.GetAxisRaw("Horizontal");
-        moveYraw = Input.GetAxisRaw("Vertical");
+        _moveXraw = Input.GetAxisRaw("Horizontal");
+        _moveYraw = Input.GetAxisRaw("Vertical");
 
-        moveDirection_Raw = new Vector2(moveXraw, moveYraw).normalized;
+        _moveDirection_Raw = new Vector2(_moveXraw, _moveYraw).normalized;
     }
 
     private Vector2 GetMousePosition()
     {
-        //mousePosition = _camera.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         return _camera.ScreenToWorldPoint(Input.mousePosition) - transform.position;
         //return Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg - 90;
     }
 
     private void BodyRotate()
     {
-        mousePosition = GetMousePosition();
-
-        Quaternion q = Quaternion.LookRotation(Vector3.forward, mousePosition);
-
+        _mousePosition = GetMousePosition();
+        Quaternion q = Quaternion.LookRotation(Vector3.forward, _mousePosition);
         _rb.rotation = Quaternion.RotateTowards(transform.rotation, q, _rotateMobility).eulerAngles.z;
     }
 
     private void Move()
     {
+<<<<<<< Updated upstream
         // if (moveDirection_Raw == Vector2.zero)
         // {
         //     ChangeEngineAnimationValues(false);
@@ -148,6 +144,9 @@ public class PlayerShipMovement : MonoBehaviour
         // }
 
         if (moveDirection_Raw != Vector2.zero)
+=======
+        if (_moveDirection_Raw == Vector2.zero)
+>>>>>>> Stashed changes
         {
             ChangeEngineAnimationValues(true); // change to Action
             _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
@@ -160,19 +159,27 @@ public class PlayerShipMovement : MonoBehaviour
                 if (_rb.velocity.magnitude <= 0.001f)
                     _rb.velocity = Vector2.zero;
                 else
-                    _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * 100 * Time.deltaTime, ForceMode2D.Force);
+                    _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * Time.deltaTime, ForceMode2D.Force);
             }
         }
+<<<<<<< Updated upstream
 
         if (pushBack != Vector2.zero)
         {
             pushBack /= 100;
             _rb.AddForce(pushBack, ForceMode2D.Impulse);
             pushBack = Vector2.zero;
+=======
+        else
+        {
+            ChangeEngineAnimationValues(true); // Rework to Action
+            _rb.AddForce(_moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+>>>>>>> Stashed changes
         }
     }
 
     private void LateUpdate()
+<<<<<<< Updated upstream
     {
         if (_rb.velocity.magnitude > 0) // Decrease to maxSpeed
         {
@@ -192,23 +199,18 @@ public class PlayerShipMovement : MonoBehaviour
 
 
     private IEnumerator WaitFor()
+=======
+>>>>>>> Stashed changes
     {
-        while (true)
+        if (_moveDirection_Raw != Vector2.zero)
         {
-            yield return new WaitForFixedUpdate();
-            if (_rb.velocity.magnitude > _maxSpeed && moveDirection_Raw != Vector2.zero)
-            {
-                // Vector2 vectorInertia = _rb.velocity.normalized * _inertiaFactor * Time.deltaTime;
-                // _rb.velocity -= vectorInertia;
-
-                // if (_rb.velocity.magnitude < _maxSpeed)
-                //     _rb.velocity = _rb.velocity.normalized * _maxSpeed;
-
-                //_rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * Time.deltaTime, ForceMode2D.Force);
-                _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * 100 * Time.deltaTime, ForceMode2D.Force);
-            }
+            _rb.AddForce(-_rb.velocity * (_enginesPullPower * _ratioSpeed) * Time.fixedDeltaTime, ForceMode2D.Force);
         }
     }
+
+    //private Vector2 pushBack = Vector2.zero;
+    //public void AddVectorPushBack(Vector2 vector) => pushBack += vector;
+    public void AddVectorPushBack(Vector2 vectorPush) => _rb.AddForce(vectorPush / 100, ForceMode2D.Impulse);
 
     private void OnDrawGizmos()
     {
@@ -218,7 +220,7 @@ public class PlayerShipMovement : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
 
         Vector2 position = new Vector2(transform.position.x, transform.position.y);
-        DrawLine(moveDirection_Raw);
+        DrawLine(_moveDirection_Raw);
 
         Gizmos.color = Color.red;
         DrawLine(_rb.velocity);
