@@ -46,11 +46,7 @@ public class PlayerShipMovement : MonoBehaviour
             throw new NullReferenceException("shipConfiguration equals null");
 
         _rb = GetComponent<Rigidbody2D>();
-<<<<<<< Updated upstream
-        //StartCoroutine(WaitFor());
-=======
         _inertiaFactor *= 100;
->>>>>>> Stashed changes
     }
 
     private void ChangeEngineAnimationValues(bool value)
@@ -125,35 +121,9 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void Move()
     {
-<<<<<<< Updated upstream
-        // if (moveDirection_Raw == Vector2.zero)
-        // {
-        //     ChangeEngineAnimationValues(false);
-        //     if (_rb.velocity.magnitude > 0)
-        //     {
-        //         if (_rb.velocity.magnitude <= 0.001f)
-        //             _rb.velocity = Vector2.zero;
-        //         else
-        //             _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * 100 * Time.deltaTime, ForceMode2D.Force);
-        //     }
-        // }
-        // else
-        // {
-        //     ChangeEngineAnimationValues(true);
-        //     _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
-        // }
-
-        if (moveDirection_Raw != Vector2.zero)
-=======
         if (_moveDirection_Raw == Vector2.zero)
->>>>>>> Stashed changes
         {
-            ChangeEngineAnimationValues(true); // change to Action
-            _rb.AddForce(moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
-        }
-        else // Inertia if no Input
-        {
-            ChangeEngineAnimationValues(false); // change to Action
+            ChangeEngineAnimationValues(false);
             if (_rb.velocity.magnitude > 0)
             {
                 if (_rb.velocity.magnitude <= 0.001f)
@@ -162,45 +132,14 @@ public class PlayerShipMovement : MonoBehaviour
                     _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * Time.deltaTime, ForceMode2D.Force);
             }
         }
-<<<<<<< Updated upstream
-
-        if (pushBack != Vector2.zero)
-        {
-            pushBack /= 100;
-            _rb.AddForce(pushBack, ForceMode2D.Impulse);
-            pushBack = Vector2.zero;
-=======
         else
         {
             ChangeEngineAnimationValues(true); // Rework to Action
             _rb.AddForce(_moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
->>>>>>> Stashed changes
         }
     }
 
     private void LateUpdate()
-<<<<<<< Updated upstream
-    {
-        if (_rb.velocity.magnitude > 0) // Decrease to maxSpeed
-        {
-            if (moveDirection_Raw != Vector2.zero)
-            {
-                if (_rb.velocity.magnitude <= _maxSpeed)
-                    _rb.AddForce(-_rb.velocity.normalized * _enginesPullPower * Mathf.Pow(_rb.velocity.magnitude / _maxSpeed, 1) * Time.fixedDeltaTime, ForceMode2D.Force); // temp Mathf.Pow
-                else
-                    _rb.AddForce(-_rb.velocity.normalized * _enginesPullPower * _maxSpeed * Time.fixedDeltaTime, ForceMode2D.Force);
-            }
-        }
-    }
-
-    private Vector2 pushBack = Vector2.zero;
-    public void AddVectorPushBack(Vector2 vector) => pushBack += vector;
-
-
-
-    private IEnumerator WaitFor()
-=======
->>>>>>> Stashed changes
     {
         if (_moveDirection_Raw != Vector2.zero)
         {
