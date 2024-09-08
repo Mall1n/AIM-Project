@@ -6,18 +6,18 @@ using System.Collections;
 // [ExecuteAlways]
 public class PlayerShipMovement : MonoBehaviour
 {
+    public static Action<bool> OnPlayerMove;
+
     [Header("Main Attributes")]
-    [SerializeField] private ShipConfiguration _shipConfiguration;
     [SerializeField] private Camera _camera;
 
-
-    [Header("Log Attributes")]
     //Log
+    [Header("Log Attributes")]
     [SerializeField] private bool LogDrawLinesDirection = true;
     //Log
 
 
-    [SerializeField][Range(0, 2)] float _inertiaFactor = 0.1f;
+    [SerializeField][Range(0, 50)] float _inertiaFactor = 5;
 
     private float _maxSpeed = 0;
     private float _enginesPullPower = 0;
@@ -38,30 +38,26 @@ public class PlayerShipMovement : MonoBehaviour
     private float _moveXraw = 0;
     private float _moveYraw = 0;
     private float _ratioSpeed => _rb.velocity.magnitude / _maxSpeed;
+    private IEnumerator _fixedLateUpdate;
 
 
     private void Awake()
     {
-        if (_shipConfiguration == null)
-            throw new NullReferenceException("shipConfiguration equals null");
+        _fixedLateUpdate = FixedLateUpdate();
 
         _rb = GetComponent<Rigidbody2D>();
-        _inertiaFactor *= 100;
-    }
-
-    private void ChangeEngineAnimationValues(bool value)
-    {
-        _shipConfiguration.SetAnimatorsEngineFire(value); // rework to Action
     }
 
     private void OnEnable()
     {
         ShipConfiguration._onChangedShipValues += UpdateValues;
+        StartCoroutine(_fixedLateUpdate);
     }
 
     private void OnDisable()
     {
         ShipConfiguration._onChangedShipValues -= UpdateValues;
+        StopCoroutine(_fixedLateUpdate);
     }
 
     private void Update()
@@ -78,6 +74,7 @@ public class PlayerShipMovement : MonoBehaviour
         Move();
 
         BodyRotate();
+        //Debug.Log("FixedUpdate");
     }
 
     private void UpdateValues(float maxSpeed, float enginesPullPower, float mobility)
@@ -102,8 +99,12 @@ public class PlayerShipMovement : MonoBehaviour
     {
         _moveXraw = Input.GetAxisRaw("Horizontal");
         _moveYraw = Input.GetAxisRaw("Vertical");
-
         _moveDirection_Raw = new Vector2(_moveXraw, _moveYraw).normalized;
+
+        if (_moveDirection_Raw != Vector2.zero)
+            OnPlayerMove?.Invoke(true);
+        else
+            OnPlayerMove?.Invoke(false);
     }
 
     private Vector2 GetMousePosition()
@@ -121,35 +122,55 @@ public class PlayerShipMovement : MonoBehaviour
 
     private void Move()
     {
-        if (_moveDirection_Raw == Vector2.zero)
-        {
-            ChangeEngineAnimationValues(false);
-            if (_rb.velocity.magnitude > 0)
-            {
-                if (_rb.velocity.magnitude <= 0.001f)
-                    _rb.velocity = Vector2.zero;
-                else
-                    _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * Time.deltaTime, ForceMode2D.Force);
-            }
-        }
-        else
-        {
-            ChangeEngineAnimationValues(true); // Rework to Action
+        if (_moveDirection_Raw != Vector2.zero)
             _rb.AddForce(_moveDirection_Raw * _enginesPullPower * Time.fixedDeltaTime, ForceMode2D.Force);
+    }
+
+    private IEnumerator FixedLateUpdate()
+    {
+        while (true)
+        {
+            yield return new WaitForFixedUpdate();
+            SpeedLimit();
+
+            Inertia();
+            //Debug.Log("FixedLateUpdate");
         }
     }
 
-    private void LateUpdate()
+    private void SpeedLimit()
     {
         if (_moveDirection_Raw != Vector2.zero)
         {
-            _rb.AddForce(-_rb.velocity * (_enginesPullPower * _ratioSpeed) * Time.fixedDeltaTime, ForceMode2D.Force);
+            _rb.AddForce(-_rb.velocity.normalized * (_enginesPullPower * _ratioSpeed) * Time.fixedDeltaTime, ForceMode2D.Force);
+        }
+        else
+        {
+            if (_ratioSpeed > 1)
+                _rb.AddForce(-_rb.velocity.normalized * (_enginesPullPower * (_ratioSpeed - 1)) * Time.fixedDeltaTime, ForceMode2D.Force);
         }
     }
 
-    //private Vector2 pushBack = Vector2.zero;
-    //public void AddVectorPushBack(Vector2 vector) => pushBack += vector;
-    public void AddVectorPushBack(Vector2 vectorPush) => _rb.AddForce(vectorPush / 100, ForceMode2D.Impulse);
+    private void Inertia()
+    {
+        if (_rb.velocity.magnitude <= 0)
+            return;
+
+        if (_ratioSpeed > 1)
+        {
+            AddForce();
+        }
+        else if (_moveDirection_Raw == Vector2.zero)
+        {
+            if (_rb.velocity.magnitude <= 0.001f)
+                _rb.velocity = Vector2.zero;
+            else
+                AddForce();
+        }
+
+        void AddForce() => _rb.AddForce(-_rb.velocity.normalized * _inertiaFactor * Time.fixedDeltaTime, ForceMode2D.Force);
+    }
+    public void AddVectorPushBack(Vector2 vectorPush) => _rb.AddForce(vectorPush * 0.005f, ForceMode2D.Impulse);
 
     private void OnDrawGizmos()
     {

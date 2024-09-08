@@ -869,7 +869,7 @@ MonoBehaviour:
   audioClipFire: {fileID: 8300000, guid: e3e44d700e90f0d43b2ff5afc98bcee1, type: 3}
   volumeModifier: 0.5
   chamber: 1
-  forceShotPushBack: 1
+  forceShotPushBack: 0.15
 --- !u!4 &7160856057258584108 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4626892002063666658, guid: 8649ccb25fcf75541a0ead0cc10b3430, type: 3}

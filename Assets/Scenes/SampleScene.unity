@@ -1196,10 +1196,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e6610d3b89d69948a8fc57a322ff08e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shipConfiguration: {fileID: 437416112}
   _camera: {fileID: 519420031}
   LogDrawLinesDirection: 1
-  _inertiaFactor: 0.1
+  _inertiaFactor: 5
 --- !u!4 &1312938016 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8158069607355630510, guid: b07e67bed2f769d4da9fc1b954fcf8a3, type: 3}
